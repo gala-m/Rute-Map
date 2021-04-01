@@ -2,296 +2,437 @@
 
 // initialize Leaflet
 
-let map = L.map('map').setView({lon: 25.9249, lat: -24.64443}, 14); 
-L.tileLayer('https://api.mapbox.com/styles/v1/winniatthepark/ckk518ast0a7o17paz5r7bros/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2lubmlhdHRoZXBhcmsiLCJhIjoiY2tocWxwYjB3MGFkeTJxcGJ6cDZzd285NCJ9.gZ7tGDVxt_ArW9WptTgK8A', {
-    maxZoom: 19,
+let transport = L.tileLayer('https://api.mapbox.com/styles/v1/winniatthepark/ckk518ast0a7o17paz5r7bros/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2lubmlhdHRoZXBhcmsiLCJhIjoiY2tocWxwYjB3MGFkeTJxcGJ6cDZzd285NCJ9.gZ7tGDVxt_ArW9WptTgK8A', {
 	attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors </a> ',
 	accessToken: 'pk.eyJ1Ijoid2lubmlhdHRoZXBhcmsiLCJhIjoiY2tocWxwYjB3MGFkeTJxcGJ6cDZzd285NCJ9.gZ7tGDVxt_ArW9WptTgK8A',
-	snappable: true,
-}).addTo(map);
-
-let drawnItems = L.featureGroup().addTo(map);
-let cartoData = L.layerGroup().addTo(map);
-let polygonLayer = L.featureGroup().addTo(map);
-
-// add leaflet.pm controls to the map
-
-map.pm.addControls({
-	edit: {
-		featureGroup: polygonLayer, 
-	}
 });
 
-polygonLayer.pm.enable(
-	options = {
-		position: 'topright',
-		drawRectangle: false, // adds button to draw a rectangle
-		drawPolygon: false, // adds button to draw a polygon
-		drawCircle: false, 
-		drawMarker: false, 
-		editPolygon: false
-	}
-);
+mapLink = '<a href="http://www.esri.com/">Esri</a>';
+wholink = 'i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community';
 
-// add leaflet.pm controls to the map
-map.pm.addControls(options);
-
-// listen to vertexes being added to the workingLayer (works only on polylines & polygons)
-map.on('pm:drawstart', function(e) {
-  const layer = e.workingLayer;
-
-  layer.on('pm:vertexadded', function(e) {
-    // e includes the new vertex, it's marker
-    // the index in the coordinates array
-    // the working layer and shape
-  });
-
-	map.on('pm:drawend', function(e) {
-    	layer.addTo(polygonLayer)
-		createFormPopup();
-
-	});
+let satellite = L.tileLayer('http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+	attribution: '&copy; ' + mapLink + ', ' + wholink
 
 });
 
-/*
-var myStyle = {
-    "color": "#ff7800",
-    "weight": 5,
-    "opacity": 0.65
+let map = L.map('map', {
+	center: [-24.64443, 25.9249],
+	zoom: 15,
+	layers: [transport]
+});
+
+
+let baseMaps = {
+	"Roads": transport,
+	"Satellite": satellite
 };
 
-var url = 'copyroad.geojson'; 
- //var bbTeam = L.geoJSON(null, {onEachFeature: forEachFeature, style: style});
-var bbTeam = L.geoJSON(null, {
-	style: myStyle
+let cartoData = L.layerGroup().addTo(map);
+
+let overlayMaps = {
+	"Stops": cartoData
+}
+
+L.control.layers(baseMaps, overlayMaps).addTo(map);
+
+// Draw
+
+let drawnItems = L.featureGroup().addTo(map);
+map.addLayer(drawnItems)
+
+drawControl = new L.Control.Draw({
+	draw: {
+		polygon: false,
+		polyline: false,
+		rectangle: false,
+		circle: false,
+		circlemarker: false,
+		marker: true
+	},
+	edit: {
+		featureGroup: drawnItems
+	}
+}).addTo(map);
+
+var drawControlEditOnly = new L.Control.Draw({
+	edit: {
+		featureGroup: drawnItems
+	},
+	draw: false
 });
 
-// Get GeoJSON data and create features.
-$.getJSON(url, function(data) {
-    bbTeam.addData(data);
+map.addControl(drawControl)
+
+map.addEventListener("draw:created", function (e) {
+	e.layer.addTo(drawnItems);
+	drawControl.remove(map);
+	drawControlEditOnly.addTo(map);
+    createFormPopup();
 });
 
-bbTeam.addTo(map);
+map.addEventListener("draw:editstart", function (e) {
+	drawnItems.closePopup();
+});
+map.addEventListener("draw:deletestart", function (e) {
+	drawnItems.closePopup();
+});
+map.addEventListener("draw:editstop", function (e) {
+	drawnItems.openPopup();
+});
+map.addEventListener("draw:deletestop", function (e) {
+	if (drawnItems.getLayers().length > 0) {
+		drawnItems.openPopup();
+	};
+	drawControlEditOnly.remove(map);
+	drawControl.addTo(map);
+});
 
-var topology = bbTeam.topology({bbTeam: geojson});
 
-*/
+
+
+
+// create custom icon
+var firefoxIcon = L.icon({
+	iconUrl: "bus.svg",
+	iconSize: [20, 20], // size of the icon
+});
+
+var redIcon = L.icon({
+	iconUrl: "red.svg",
+	iconSize: [20, 20], // size of the icon
+});
+
+// specify popup options 
+var customOptions =
+{
+	'maxWidth': '500',
+	'className': 'custom'
+}
 
 // Add data from CARTO using the SQL API
+
 let url1 = "https://winni.carto.com/api/v2/sql";
+let urlinfo = url1 + "?q=";
 let urlGeoJSON = url1 + "?format=GeoJSON&q=";
-const sqlQuery = "SELECT cartodb_id, the_geom, name, area, route_number FROM stops";
+let test = 
+"SELECT points.cartodb_id, points.the_geom, names.name AS stopname, route.route1, route.route2, route.route3 FROM points INNER JOIN names ON points.the_geom = names.the_geom INNER JOIN route ON points.the_geom = route.the_geom";
+
+
+function fetchroutes() {
+	fetch(urlGeoJSON + test)
+		.then(function (response) {
+			return response.json();
+		})
+		.then(function (data) {
+			console.log(data)
+			L.geoJSON(data, {
+				pointToLayer: function (feature, latlng) {
+					return L.marker(latlng, { icon: firefoxIcon }); 
+				},
+				onEachFeature: addPopup
+			}).addTo(cartoData);
+		})	
+}
+
+fetchroutes();
+
 
 function addPopup(feature, layer) {
-	if (feature.properties.name, feature.properties.area, feature.properties.route_number) {
 
-		layer.bindPopup(feature.properties.cartodb_id+" - "+feature.properties.name + 
-		"<br>" + feature.properties.area + 
-		"<br>Route " + feature.properties.route_number) 
+	class Base {
 
-	} else if (feature.properties.name) {
-		let popupContent = 
-        '<form>' + 
-        'Route:<br><input type="text" id="input_area" required="required"><br>' +
-		'#:<br><input type="text" id="input_routenumber" required="required"><br>' +
-		'Nickname:<br><input type="text" id="input_nick" required="required"><br>' +
-		'ID:<br><input type="text" id="input_cartodb_id" required="required"><br>' +
-        '<input type="button" value="Submit" id="submitrest">' +
-        '</form>';
+		constructor(cartodb_id) {
+			this.cartodb_id = cartodb_id
+		}
 
-		layer.bindPopup(feature.properties.cartodb_id+" - "+feature.properties.name + popupContent )
-	} else {
-		layer.bindPopup(feature.properties.cartodb_id +
-			'<form>' + 
-			'Name:<br><input type="text" id="input_name"><br>' +
-			'Route:<br><input type="text" id="input_area"><br>' +
-			'#<br><input type="text" id="input_routenumber"><br>' +
-			'Nickname:<br><input type="text" id="input_nick"><br>' +
-			'ID:<br><input type="text" id="input_cartodb_id" required="required"><br>' +
-			'<input type="button" value="submit" id="submitall">' + 
+		id() {
+			return `${this.cartodb_id}` 
+		}
+	}
+
+	class First extends Base {
+
+		constructor(cartodb_id, stopname, route1) {
+			super(cartodb_id);
+			this.stopname = stopname
+			this.route1 = route1
+		}
+
+		first() {
+			return `${this.cartodb_id} - ` + `${this.stopname}` + `<br> ${this.route1} ` 
+		}
+	}
+
+	class Area extends First {
+
+		constructor(cartodb_id, stopname, route1, route2) {
+			super(cartodb_id, stopname, route1);
+			this.route2 = route2
+		}
+
+		route() {
+			return `${this.cartodb_id} - ` + `${this.stopname}` + `<br> ${this.route1} ` + ` <br> ${this.route2}`
+		}
+	}
+
+	class All extends Area {
+
+		constructor(cartodb_id, stopname, route1, route2, route3) {
+			super(cartodb_id, stopname, route1, route2);
+			this.route3 = route3
+		}
+
+		complete() {
+			return `${this.cartodb_id} - ` + `${this.stopname}` + `<br> ${this.route1} ` + `<br> ${this.route2}` + `<br>${this.route3} `
+		}
+	}
+
+	const all = new All(feature.properties.cartodb_id, feature.properties.stopname, feature.properties.route1, feature.properties.route2, feature.properties.route3);
+	const popupContent =
+			"<br><b>Contribute a route</b><br>" +
+			'<form >' +
+			'<br><input type="text" id="input_area" placeholder="Route" style="width: 100%;"><br>' +
+			'<br><input type="text" id="input_routenumber" placeholder="#" style="width: 45%;"><input type="text" id="input_cartodb_id" placeholder="ID" required="required" style="width: 45%;"><br>' +
+			'<input type="button" value="Save" style="width: 100%;" id="submitrest">' +
 			'</form>'
-		)
+
+	const popupName = 
+			"<br><b>Contribute a route</b><br>" +
+			'<form >' +
+			'<br><input type="text" id="input_name" placeholder="Stop Name" style="width: 100%;"><br>' +
+			'<br><input type="text" id="input_area" placeholder="Route" style="width: 100%;"><br>' +
+			'<br><input type="text" id="input_routenumber" placeholder="#" style="width: 45%;"><input type="text" id="input_cartodb_id" placeholder="ID" required="required" style="width: 45%;"><br>' +
+			'<input type="button" value="Save" style="width: 100%;" id="submitall">' +
+			'</form>'
+
+	if (feature.properties.cartodb_id, feature.properties.stopname, feature.properties.route1, feature.properties.route2, feature.properties.route3) {
+		layer.bindPopup(`
+		${all.complete()}<br>`
+		); 
+	} else if (feature.properties.cartodb_id, feature.properties.stopname, feature.properties.route1, feature.properties.route2) {
+		layer.bindPopup(`
+		${all.route()}<br>`
+		+ popupContent
+		);  
+	} else if (feature.properties.cartodb_id, feature.properties.stopname, feature.properties.route1) {
+		layer.bindPopup(`
+		${all.first()}<br>`
+		+ popupContent
+		);  
+	} else if (feature.properties.cartodb_id, feature.properties.stopname) {
+		layer.bindPopup(`
+		${all.first()}<br>`
+		+ popupContent
+		);
+	} else if (feature.properties.cartodb_id){
+		layer.bindPopup(`
+		${all.route()}`
+		+ popupName
+		); 		
+	}
+
+
+};
+
+function setData(e) {
+    
+	if (e.target && e.target.id == "submit" || e.target && e.target.id == "submitrest" || e.target && e.target.id == "submitall") {
+
+		const sql = new cartodb.SQL({ user: 'winni' });
+		
+		const enteredArea = document.getElementById("input_area").value;
+		const enteredNumber = document.getElementById("input_routenumber").value;
+		
+		const route = enteredArea + " Route " + enteredNumber;
+
+		if (e.target && e.target.id == "submit") {
+
+			drawnItems.eachLayer(function (layer) {
+
+				const enteredStopname = document.getElementById("input_name").value;
+				let drawing = JSON.stringify(layer.toGeoJSON().geometry);
+
+				query = "SELECT * FROM stops_complete('" + drawing + "', '" + enteredStopname +"','" + route +"')"
+				experi();
+
+            	// Transfer submitted drawing to the CARTO layer
+				let newData = layer.toGeoJSON();
+				newData.properties.description = enteredStopname;
+				newData.properties.name = enteredArea;
+				newData.properties.name = enteredNumber;
+				L.geoJSON(newData, {
+							pointToLayer: function (feature, latlng) {
+								return L.marker(latlng, { icon: firefoxIcon }); 
+							},
+							onEachFeature: addPopup
+						}).addTo(cartoData);
+
+				// Clear drawn items layer
+			}); 
+
+		} else if (e.target && e.target.id == "submitrest") {
+			
+			const enteredID = document.getElementById("input_cartodb_id").value;
+
+			cartoData.eachLayer(function (layer) {
+				
+				// sql.execute("SELECT * FROM route_func('" + route + "', " + enteredID + ")");
+				query = "SELECT * FROM route_func('" + route + "', " + enteredID + ")";
+				experi()
+
+			})
+		} else if (e.target && e.target.id == "submitall") {
+
+			cartoData.eachLayer(function (layer) {
+
+				const enteredID = document.getElementById("input_cartodb_id").value;
+				const enteredStopname = document.getElementById("input_name").value;
+				
+				query = "SELECT * FROM names_route('" + route + "', '" + enteredStopname + "', " + enteredID + ")";
+				experi()
+			})
+		}
+	}
+
+}
+
+function experi() {
+	if (document.getElementById("input_area").value == '' || document.getElementById("input_routenumber").value == '') {
+		alert("Please fill in all the fields.")
+		return true;
+	} else {
+		if (confirm('Ready to Save?')) {
+			fetch(url1, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded"
+				},
+				body: "q=" + encodeURI(query)
+			})
+				.then(response => {
+					if (!response.ok) throw response;
+					return response.json()
+				})
+				.then(function (data) {
+				
+					on();
+					cartoData.clearLayers();
+
+					drawnItems.closePopup()
+					drawnItems.clearLayers()
+
+					fetchroutes();
+				})
+				.catch(error => {
+					error.json().then((body) => {
+						error1 = JSON.stringify(body)
+						error2 = error1.replace('{', '').replace('}', '').replace('"', '');
+
+						alert("Error saving data: " + error2)
+					});
+					
+				});
+		}
 	}
 }
 
-fetch(urlGeoJSON + sqlQuery)
-	.then(function(response) {
-		return response.json();
-	})
-	.then(function(data) {
-		L.geoJSON(data, {onEachFeature: addPopup}).addTo(cartoData);
-	});
+// Overlay
+
+function on() {
+	document.getElementById("overlay").style.display = "block";
+}
+
+function off() {
+	document.getElementById("overlay").style.display = "none";
+}
 
 // Routename Pop-up
 function createFormPopup() {
-    let popupContent = 
-        '<form name="myForm" onsubmit="return validateForm()" method="post">' + 
-		'Name:<br><input type="text" id="input_name" required="required"><br>' +
-        'Route:<br><input type="text" id="input_area" required><br>' +
-		'#:<br><input type="text" id="input_routenumber"><br>' +
-		'Nickname:<br><input type="text" id="input_nick"><br>' +
-        '<input type="button" value="Submit" id="submit">' + 
-        '</form>';
-    polygonLayer.bindPopup(popupContent).openPopup();
+	let popupContent =
+		'<form >' +
+		'<br><input type="text" id="input_name" placeholder="Stop Name" style="width: 120px;"><br>' +
+		'<br><input type="text" id="input_area" placeholder="Route" style="width: 100%;"><br>' +
+		'<br><input type="text" id="input_routenumber" placeholder="#" style="width: 100%;">' +
+		'<input type="button" value="Save" style="width: 100%;" id="submit">' +
+		'</form>'
+	drawnItems.bindPopup(popupContent).openPopup();
 }
 
-// Sending data to CARTO
-function setData(e) {
+// Search 
+
+function searchRoutes(data) {
 	
-    if(e.target && e.target.id == "submit") {
-		const enteredArea = document.getElementById("input_area").value;
-		const enteredNumber = document.getElementById("input_routenumber").value;
-		const enteredNickname = document.getElementById("input_nick").value;
-		const enteredStopname = document.getElementById("input_name").value;
+    map.removeLayer(cartoData);
 
-		// For each drawn layer
-		polygonLayer.eachLayer(function(layer) {
-
-			// SQL to put layer in -- Building the SQL query
-			let drawing = JSON.stringify(layer.toGeoJSON().geometry);
-			let sql =
-				"INSERT INTO stops (the_geom, area, route_number, name, nickname) " +
-				"VALUES (ST_SetSRID(ST_GeomFromGeoJSON('" +
-				drawing + "'), 4326), '" +
-				enteredArea + "', '" +
-				enteredNumber + "', '" +
-				enteredStopname + "', '" +
-				enteredNickname + "')";
-			console.log(sql);
-
-			if (enteredArea && enteredNickname && enteredNumber && enteredStopname) {
-				// Sending the SQL query to CARTO
-				fetch(url1, {
-					method: "POST", 
-					headers: {
-						"Content-Type": "application/x-www-form-urlencoded"
-					}, 
-					body: "q=" + encodeURI(sql)
-				})
-					.then(function(response) {
-						return response.json();
-					})
-					.then(function(data) {
-						console.log("Data saved:", data);
-					})
-					.catch(function(error) {
-						console.log("Problem saving the data:", error);
-					});				
-			} else {
-				alert("Please fill in all the fields");
-			}
-
-
-			// Transfer submitted data draw to the CARTO layer
-			let newData = layer.toGeoJSON();
-			newData.properties.area = enteredArea;
-			newData.properties.routenumber = enteredNumber;
-			newData.properties.name = enteredStopname;
-			newData.properties.nick = enteredNickname;
-			L.geoJSON(newData, {onEachFeature: addPopup}).addTo(cartoData);
+	L.geoJSON(data, {
+		pointToLayer: function (feature, latlng) {
+			return L.marker(latlng, { icon: redIcon }, 
+			map.flyTo(latlng, 14, {
+				animate: true,
+				duration: 1 // in seconds                                                
+			}));
+    },
+		onEachFeature: addPopup
 		
-		});
+	}).addTo(tempjson);
+}
 
-		// Clear drawn items layer
-		polygonLayer.closePopup();
-		polygonLayer.clearLayers();
+let tempjson = L.layerGroup().addTo(map);
 
-	} else if(e.target && e.target.id == "submitrest") {
+let search_function = (function() {
+	let text = $('#text_').val();
+	let number = $('#number_').val();
+	let searchitem = text + " Route " + number;
 
-		const enteredArea = document.getElementById("input_area").value;
-		const enteredNumber = document.getElementById("input_routenumber").value;
-		const enteredNickname = document.getElementById("input_nick").value;
-	    const enteredID = document.getElementById("input_cartodb_id").value;
-	
-		// For the already existing carto layer
-		cartoData.eachLayer(function(layer) {
+	let sql = 
+	"SELECT points.cartodb_id, route.the_geom, route.route1, route.route2, route.route3, names.name AS stopname FROM points INNER JOIN route ON route.the_geom = points.the_geom INNER JOIN names ON points.the_geom = names.the_geom WHERE route1 ilike '" + searchitem + "' OR route2 ilike '" + searchitem + "' OR route3 ilike '" + searchitem + "'";
+	let sqltext = "SELECT points.cartodb_id, route.the_geom, route.route1, route.route2, route.route3, names.name AS stopname FROM points INNER JOIN route ON route.the_geom = points.the_geom INNER JOIN names ON points.the_geom = names.the_geom WHERE CONCAT(route1, '', route2, '', route3) ILIKE '%" + text + "%'";
 
-			// SQL to put layer in -- Building the SQL query
-			let sql =
-				"UPDATE stops " +
-				"SET area = '" + enteredArea + "', " +
-				"route_number = '" + enteredNumber + "', " +
-				"nickname = '" + enteredNickname + "' " +
-				"WHERE cartodb_id = " + enteredID + ";"
-			console.log(sql);
+	if (text && number) {
+		if (true) {
+			
+			tempjson.clearLayers();
 
-			if (enteredArea && enteredNickname && enteredNumber && enteredID) {
-				// Sending the SQL query to CARTO
-				fetch(url1, {
-					method: "POST", 
-					headers: {
-						"Content-Type": "application/x-www-form-urlencoded"
-					}, 
-					body: "q=" + encodeURI(sql)
-				})
-					.then(function(response) {
-						return response.json();
-					})
-					.then(function(data) {
-						console.log("Data saved:", data);
-					})
-					.catch(function(error) {
-						console.log("Problem saving the data:", error);
-					});				
-			} else {
-				alert("Please fill all the fields");
-			}
-		});
+			fetch(urlGeoJSON, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded"
+				},
+				body: "q=" + encodeURI(sql)
+			})
 
-		// Clear drawn items layer
-		drawnItems.closePopup();
-		drawnItems.clearLayers();
+				// make it uncheck the stops box, to remove the other stops when looking for the queries ones
+				.then((response) => response.json())
 
-	} else if(e.target && e.target.id == "submitall") {
-		
-		const enteredStopname = document.getElementById("input_name").value;
-		const enteredArea = document.getElementById("input_area").value;
-		const enteredNumber = document.getElementById("input_routenumber").value;
-		const enteredNickname = document.getElementById("input_nick").value;
-	    const enteredID = document.getElementById("input_cartodb_id").value;
-	
-		// For the already existing carto layer
-		cartoData.eachLayer(function(layer) {
+				.then(function (data) {
+					searchRoutes(data)
+				}) 
+			return false
+		}                  
+	} else if (text) {
+		if (true) {
+			
+			tempjson.clearLayers();
 
-			// SQL to put layer in -- Building the SQL query
-			let sql =
-				"UPDATE stops " +
-				"SET name = '" + enteredStopname + "', " +				
-				"area = '" + enteredArea + "', " +
-				"route_number = '" + enteredNumber + "', " +
-				"nickname = '" + enteredNickname + "' " +
-				"WHERE cartodb_id = " + enteredID + ";"
-			console.log(sql);
+			fetch(urlGeoJSON, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/x-www-form-urlencoded"
+				},
+				body: "q=" + encodeURI(sqltext)
+			})
 
-			if (enteredArea && enteredNickname && enteredNumber && enteredStopname && enteredID) {
-				// Sending the SQL query to CARTO
-				fetch(url1, {
-					method: "POST", 
-					headers: {
-						"Content-Type": "application/x-www-form-urlencoded"
-					}, 
-					body: "q=" + encodeURI(sql)
-				})
-					.then(function(response) {
-						return response.json();
-					})
-					.then(function(data) {
-						console.log("Data saved:", data);
-					})
-					.catch(function(error) {
-						console.log("Problem saving the data:", error);
-					});				
-			} else {
-				alert("Please fill all the fields");
-			}
+				.then((response) => response.json())
 
-		
-		});
+				.then(function (data) {
+					searchRoutes(data)
+				}) 
+			return false
+		}
+	} else if (text == "") {
+		return false
 
-		// Clear drawn items layer
-		cartoData.closePopup();
 	}
-}
+})
 
 document.addEventListener("click", setData)
