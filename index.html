@@ -2,27 +2,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OL A</title>
+    <title>LS</title>
     <link rel="stylesheet" href="./styles.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.toolbar.js/0.3.0/leaflet.toolbar.css" integrity="sha512-2KtkH1u8DAmeURtFUD431hiR8kQIXSPCgnYbalfws3t9gvqUraWhjAKGxI/dS22xTgkouQ30/ot5HzLyD7EdJA==" crossorigin="anonymous">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="">
     <link rel="stylesheet" href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css" />  
     <link rel="stylesheet" href="https://unpkg.com/leaflet.pm@latest/dist/leaflet.pm.css" />
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" integrity="sha512-ozq8xQKq6urvuU6jNgkfqAmT7jKN2XumbrX1JiB3TnF7tI48DPI4Gy1GXKD/V3EExgAs1V+pRO7vwtS1LHg0Gw==" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.toolbar.js/0.3.0/leaflet.toolbar.js" integrity="sha512-cW6lxYGEMUpgPLuzM2dechfHmUeIukolSWEkDFfU9fxdy+q5NJiSzt/3w26qLttkYLVhaymld/n1ubOAfQmJxA==" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/66ba8141a1.js" crossorigin="anonymous"></script>
     <script src="./jquery.min.js"></script>
-
+    <script src="http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js"></script>
 </head>
 <body>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://unpkg.com/leaflet.pm@latest/dist/leaflet.pm.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <script src="https://unpkg.com/leaflet.vectorgrid@latest/dist/Leaflet.VectorGrid.bundled.js"></script>
-    <div id='map' class='map' style="z-index: 1" position: relative></div>
-    <div id='export'></div>
+    <div class="wrapper">
+        <div class="box a">
+            <div id='map' class='map' style="z-index: 1" position: relative></div>
+        </div>
+        <div class="box b" style="z-index: 2">
+            <form id="search_container" method="post" onsubmit="return search_function()">
+            <input type="text" id="text_" placeholder="Route" style='width:50%'>
+            <button id="btn_submit" type="submit" name="type" value="Search" style="width:50px"><i class="fa fa-search"></i></button>
+            <input type="number" id="number_" placeholder="#" size='width:20%'>
+        </div>
+    </div>
+    <div id="overlay" onclick="off()">
+        <div id="text">Route Saved.<br/>Thank You!</div>
+    </div>  
+    <div id="err_overlay" onclick="offe()">
+        <div id="text"></div>
+    </div>  
     <script src='./main.js'></script>
 </body>
 </html>
