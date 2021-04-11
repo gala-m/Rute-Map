@@ -50,9 +50,13 @@ drawControl = new L.Control.Draw({
 		marker: true
 	},
 	edit: {
-		featureGroup: drawnItems
+		featureGroup: drawnItems,
 	}
+
 }).addTo(map);
+
+
+L.drawLocal.draw.toolbar.buttons.marker = 'place a stop';
 
 var drawControlEditOnly = new L.Control.Draw({
 	edit: {
@@ -376,6 +380,8 @@ function searchRoutes(data) {
 		
 	}).addTo(tempjson);
 }
+
+// Search
 
 let tempjson = L.layerGroup().addTo(map);
 
