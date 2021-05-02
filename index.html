@@ -1,42 +1,61 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LS</title>
+    <meta name="viewport" content="width=device-width, maximum-scale=1.0">
+    <title>Rute Map</title>
+    <link rel="shortcut icon" href="./icon.png" type="image/x-icon" />
     <link rel="stylesheet" href="./styles.css"> 
     <link rel="stylesheet" href="leaflet.css">
     <link rel="stylesheet" href="leaflet.draw.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
     <script src="https://kit.fontawesome.com/66ba8141a1.js" crossorigin="anonymous"></script>
-    <script src="./jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
 </head>
 <body>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.7/dist/html2canvas.min.js" crossorigin="anonymous"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
     <div class="wrapper">
         <div class="box a">
             <div id='map' class='map' style="z-index: 1" position: relative></div>
         </div>
-        <div class="box b" style="z-index: 2">
-            <form id="search_container" method="post" onsubmit="return search_function()">
-            <input type="text" id="text_" placeholder="Route" style='width:50%' list="routeList"> 
-                <datalist id="routeList">
-                    <label for="suggestion">or pick a route</label>
-                    <select name="altroute" id="suggestion">
-                        <option>Broadhurst</option>
-                        <option>Tlokweng</option>
-                        <option>Kgale View</option>        
-                    </select>              
-                </datalist>    
-            <button id="btn_submit" type="submit" value="Search" style="width:50px"><i class="fa fa-search"></i></button>
-            <input type="number" id="number_" placeholder="#" size='width:20%'>
-        </div>
-        <div id="result"></div>
     </div>
-    <div id="overlay" onclick="off()">
-        <div id="text">Route Saved.<br/>Thank You!</div>
-    </div>   
-    
-    <script src='./main.js'></script>
+    <div id="nav-bar" style="z-index: 3;">
+        <div id="logo"> 
+            <img class="rlogo"
+                src="rute.svg"
+                alt="routemang logo"
+                height="35px"
+                />
+        </div>
+        <div>
+            <form id="search_container" method="post" onsubmit="return search_function()" style="z-index: 2">
+                <input type="text" id="text_" placeholder="search a route" style='width:50%' list="routeList">   
+                <input type="number" id="number_" placeholder="#" size='width:40%'>
+                <button id="btn_submit" type="submit" value="Search"><i class="fa fa-search"></i></button>
+            
+            </form>
+        </div>         
+    </div>
+
+    <div id="feedback-main" style="z-index: 3;  display: none">
+        <div id="feedback-div" >
+            <div class="feedback-form" id="feedback-divi">
+              <input type="text" placeholder="Route" id="input_area" type="name" class="feedback-input" >
+              <input type="text" id="input_routenumber" class="feedback-input" placeholder="#" style="width: 45%;"><input type="text" id="input_cartodb_id" class="feedback-input" placeholder="ID e.g. 31" required="required" style="width: 45%; float: right;">
+              <div class="feedback-submit">
+                  <input type="submit" value="Send Error" onclick="return send()" class="feed-button">
+              </div>
+            </div>
+        </div>
+    </div>
+    <div id="success-main" style="z-index: 3; display: none">
+        <div id="success-div">Data sent. Thank you.</div>
+    </div>
+    <div id="results-main" style="z-index: 3; display: none">
+        <div id="no-results">No Results</div>
+    </div>
+    <a id="popup" class="feedback-button" href="mailto:tuliasubs@gmail.com" style="text-decoration:none;">contact</a>
+    <script src="./main.js"></script>
 </body>
 </html>
