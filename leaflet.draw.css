@@ -198,13 +198,13 @@
 }
 
 .leaflet-draw-toolbar .leaflet-draw-draw-marker {
-	background-image: linear-gradient(transparent, transparent), url('bus-solid.svg');
+	background-image: linear-gradient(transparent, transparent), url('./icons/bus-solid.svg');
 }
 
 .leaflet-touch .leaflet-draw-toolbar .leaflet-draw-draw-marker {
 	
 	background-size: 300px 15px;
-	background-image: linear-gradient(transparent, transparent), url('bus-solid.svg');
+	background-image: linear-gradient(transparent, transparent), url('./icons/bus-solid.svg');
 }
 
 .leaflet-draw-toolbar .leaflet-draw-draw-circlemarker {

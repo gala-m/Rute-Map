@@ -158,13 +158,13 @@ function send() {
 }
 
 var stopicon = L.icon({
-	iconUrl: "bus.png",
+	iconUrl: "./icons/bus.png",
 	iconSize: [15, 30], 
 	iconAnchor: [10, 25],
 });
 
 var resulticon = L.icon({
-	iconUrl: "bluebus.png",
+	iconUrl: "./icons/bluebus.png",
 	iconSize: [15, 30], 
 	iconAnchor: [10, 25],
 });
