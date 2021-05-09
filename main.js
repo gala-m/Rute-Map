@@ -69,7 +69,7 @@ let drawnItems = L.featureGroup().addTo(map);
 map.addLayer(drawnItems)
 
 L.drawLocal.draw.toolbar.buttons.marker = 'place a stop';
-L.drawLocal.draw.handlers.marker.tooltip.start = 'to see stops on the ground clearly <br> 1. switch to the satellite map <br> in the top-left corner, <br> 2. zoom in ';
+L.drawLocal.draw.handlers.marker.tooltip.start = 'to see stops on the ground clearly <br> 1. switch to the satellite map <br> in the top-right corner, <br> 2. zoom in ';
 
 drawControl = new L.Control.Draw({
 	draw: {
