@@ -349,8 +349,15 @@ function mass_query() {
 
 	const id1 = document.getElementById("input_cartodb_id1").value;
 	const id2 = document.getElementById("input_cartodb_id2").value; 
-	 
-	const id3 = document.getElementById("input_cartodb_id3").value;
+var foo = "test";
+	if ("input_cartodb_id3" > 0) {
+		let id3 = document.getElementById("input_cartodb_id3").value;
+
+		console.log(foo); // Interviewer: "What does this alert?" Answer: "test"
+		var foo = "bar";
+
+	} 
+	console.log(foo); //
 	const id4 = document.getElementById("input_cartodb_id4").value;
 	const id5 = document.getElementById("input_cartodb_id5").value;
 
