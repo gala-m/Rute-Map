@@ -37,10 +37,11 @@ body {
 }
 
 input[id=text_] {
-    padding-left: 5px;
+    padding: 12px;
     border: 0px;
     font-size: 17px;
     height: 44px;
+    border-left: 0.5px solid #80808078;
 
 }
 
@@ -48,37 +49,28 @@ input[id=text_]:focus, input[id=number_]:focus {
     outline: none;
 }
 
-.search {
-    padding-left: 10px;
-    padding-right: 5px;
+
+#btn_submit:focus, #btn_submit:hover {
+    background-color: #f4f4f4;
+    outline: none;
+    
+}
+
+input[id=number_] {
+    padding: 12px;
     font-size: 17px;
     border: none;
     height: 44px;
-    width: 70px;
+    width: 80px;
     overflow: hidden;
     resize: none;
     right: 50px;
     border-left: 0.5px solid #80808078;
     border-right: 0.5px solid #80808078;
-    position: absolute;
 }
 
-.inner-container {
-    background-color: rgb(255, 255, 255);
-    color: gray;
-    border-radius: 5px;
-    border-top: 2px solid #020268;
-    height: 44px;
-    position: fixed;
-    width: 200px;
-    width: 150px;
-    border: none;
-    border-left: 0.5px solid #80808078;
-    cursor: pointer;
-    padding-left: 5px;
-}
 
-.search-container:hover {
+#search_container:hover {
     box-shadow: 0 0 10px #ccc;
 }
 
@@ -109,7 +101,12 @@ input[id=text_]:focus, input[id=number_]:focus {
 }
 
 #input_cartodb_id {
-    margin-left: 6px;
+    float: right;
+}
+
+#popup {
+    line-height: 35px;
+    width: 100px
 }
 
 .feed-button {
@@ -122,6 +119,27 @@ input[id=text_]:focus, input[id=number_]:focus {
   font-size: 19px;
   padding-top: 22px;
   padding-bottom: 22px;
+}
+
+.feedback-button {
+    height: 40px;
+    background: rgb(255, 255, 255);
+    width: 100px;
+    line-height: 32px;
+    -webkit-transform: rotate(-90deg);
+    font-weight: 600;
+    color: black;
+    transform: rotate(-90deg);
+    -ms-transform: rotate(-90deg);
+    -moz-transform: rotate(-90deg);
+    text-align: center;
+    font-size: 17px;
+    position: fixed;
+    left: -40px;
+    top: 45%;
+    z-index: 999;
+    cursor: pointer;
+    border: none;
 }
 
 .feedback-input {
@@ -158,7 +176,7 @@ input[id=text_]:focus, input[id=number_]:focus {
   border-bottom: 3px solid #020268;
 }
 
-#feedback-comment,  #feedback-email, #feedback-name .netlify-form-div {
+#feedback-comment,  #feedback-email, #feedback-name {
   background-size: 30px 30px;
   background-position: 11px 8px;
   background-repeat: no-repeat;
@@ -188,17 +206,10 @@ input:focus{
 }
 
 #flagbtn {
-    background-size: 300px 15px;
-    background-image: linear-gradient(transparent, transparent), url('./icons/flag-solid.svg');
-    background-color: rgb(255, 255, 255);
-    color: rgb(170, 3, 3);
-}
-
-#locationbtn {
-    background-size: 300px 15px;
-    background-image: linear-gradient(transparent, transparent), url('./icons/compass-solid.svg');
-    background-color: rgb(255, 255, 255);
-    color: rgb(170, 3, 3);
+    width: 30px;
+    height: 31.6px;
+    padding: 7px;
+    color:  rgb(170, 3, 3);
 }
 
 #logo {
@@ -207,62 +218,6 @@ input:focus{
 
 .resulticon {
     color: #020268;
-}
-
-/* Contact box */
-
-.netlify-form {
-    background-color: #fbfbfb;
-    z-index: 3000;
-}
-
-.net-button {
-    cursor: pointer;
-    background: none;
-    border: none;
-    padding: 10px;
-}
-
-
-.popup {
-    height: 40px;
-    background: rgb(255, 255, 255);
-    width: 100px;
-    line-height: 32px;
-    -webkit-transform: rotate(-90deg);
-    font-weight: 600;
-    color: black;
-    transform: rotate(-90deg);
-    -ms-transform: rotate(-90deg);
-    -moz-transform: rotate(-90deg);
-    text-align: center;
-    font-size: 17px;
-    position: fixed;
-    left: -40px;
-    top: 45%;
-    z-index: 999;
-    border: none;
-}
-
-
-.btn_mail {
-    background: url(icons/envelope-solid.svg) no-repeat;
-    background-color: rgb(255, 255, 255);
-    font-size: 15px;
-    border: none;
-    cursor: pointer;
-    height: 18px;
-    width: 18px;
-    transform: rotate(90deg);
-}
-
-.btn_plus {
-    background: url(icons/plus-solid.svg) no-repeat;
-    background-color: rgb(255, 255, 255);
-    font-size: 15px;
-    border: none;
-    cursor: pointer;
-    float: right
 }
 
 @media only screen and (min-width: 630px) {
@@ -285,7 +240,7 @@ input:focus{
         top: 10px;
     }
 
-    .search-container {
+    #search_container {
         background-color: rgb(255, 255, 255);
         border-radius: 5px;
         height: 43px;
@@ -295,14 +250,14 @@ input:focus{
         top: 10px;
     }
 
-    .overlay {
+    #feedback-main, #success-main, #results-main #response-main{
         position: fixed;
         float: left;
         top: 22%;
         left: 45%;
     }
 
-    .inner-div, .netlify-form {
+    #feedback-div, #response-div, #success-div, #no-results {
         background-color: rgb(255, 255, 255);
         padding-left: 15px;
         padding-right: 15px;
@@ -320,22 +275,26 @@ input:focus{
         box-shadow: 0 3px 14px rgba(0,0,0,0.2);
     }
 
+    #overlay {
+        top: 100px;
+        color: rgb(0, 16, 101, 0.9);
+        z-index: 900;
+        position: absolute;
+    }
+
     #btn_submit {
-        background: url(icons/search-solid.svg) no-repeat;
-        margin: 12px;
-        margin-right: 15px;
+        padding: 12px 12px;
         float: right;
         background-color: rgb(255, 255, 255);
         font-size: 15px;
         border: none;
         cursor: pointer;
         border-radius: 0 3px 3px 0;
-        height: 20px;
-        width: 20px;
-        
+        height: 44px;
+        width: 50px;
+        color:  rgba(2, 2, 104, 1);
 
     }
-
 }
 
 @media only screen and (max-width: 629px) {
@@ -361,7 +320,7 @@ input:focus{
 
     }
 
-    .search-container {
+    #search_container {
         background-color: rgb(255, 255, 255);
         border-radius: 5px;
         border-top: 2px solid #020268;
@@ -374,10 +333,11 @@ input:focus{
     }
 
     input[id="number_"] {
+        padding: 10px;
         font-size: 17px;
         border: none;
         height: 44px;
-        width: 60px;
+        width: 80px;
         overflow: hidden;
         resize: none;
         border-left: 0.5px solid #80808078;
@@ -385,20 +345,19 @@ input:focus{
     }
 
     #btn_submit {
-        background: url(icons/search-solid.svg) no-repeat;
-        margin: 12px;
+        padding: 8px 8px;
         float: right;
         background-color: rgb(255, 255, 255);
-        font-size: 15px;
+        font-size: 9px;
         border: none;
         cursor: pointer;
         border-radius: 0 3px 3px 0;
-        height: 20px;
-        width: 20px;
+        height: 44px;
+        width: 60px;
         color:  rgba(2, 2, 104, 1);
     }
 
-    .overlay {
+    #feedback-main, #success-main, #results-main {
         position: absolute;
         top: 11%;
         left: 15px;
@@ -436,6 +395,6 @@ input:focus{
         position: absolute; 
         left: auto; 
         right: 10px; 
-        top: 145px;
+        top: 105px;
     }  
 }
