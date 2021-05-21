@@ -1,26 +1,28 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, maximum-scale=1.0">
+    <meta name="description" content="Find combi and taxi routes in Gaborone, Botswana.">
     <title>Rute Map</title>
+    <link rel="preload" href="main.js" as="script" crossorigin>
     <link rel="shortcut icon" href="./icons/icon.svg" type="image/x-icon" />
     <link rel="stylesheet" href="./styles.css"> 
     <link rel="stylesheet" href="leaflet.css">
     <link rel="stylesheet" href="leaflet.draw.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
-    <script src="https://kit.fontawesome.com/66ba8141a1.js" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
 </head>
 <body>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
-   <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
     <div class="wrapper">
         <div class="box a">
             <div id='map' class='map' style="z-index: 1" position: relative></div>
         </div>
     </div>
-    <div id="nav-bar" style="z-index: 3;">
+    <nav id="nav-bar" style="z-index: 3;">
         <div id="logo"> 
             <img class="rlogo"
                 src="./icons/rute.svg"
@@ -28,34 +30,64 @@
                 height="35px"
                 />
         </div>
-        <div>
-            <form id="search_container" method="post" onsubmit="return search_function()" style="z-index: 2">
-                <input type="text" id="text_" placeholder="search a route" style='width:50%' list="routeList">   
-                <input type="number" id="number_" placeholder="#" size='width:40%'>
-                <button id="btn_submit" type="submit" value="Search"><i class="fa fa-search"></i></button>
-            
-            </form>
-        </div>         
+        <form id="search_container" class="search-container" method="post" onsubmit="return search_function()" style="z-index: 2">
+            <div id="search-type" class="inner-container" style="z-index: 5; display: none">
+                <input type="text" id="text_" placeholder="search a route">   
+            </div>
+            <select id="search-select" class="inner-container">
+                <option value="">   Show Route Index</option>
+                <option>Broadhurst</option>
+                <option value="Tlokweng">Tlokweng</option>
+                <option value="Kgale View">Kgale View</option>
+                <option value="searchdata" onclick="return search_bar()">Not the routes you're looking for? Search the database</option>
+            </select>
+                <input type="number" id="search-number" class="search" placeholder="#" size='width:30%'>
+                <button id="btn_submit" type="submit" ></button>
+        </form>         
+    </nav>
+    <div id="form-div" class="overlay" style="z-index: 5; display: none">
+        <form id="form-contact" method="POST" data-netlify="true" class="netlify-form">
+            <input type="text" name="name" placeholder="Name" class="feedback-input"/> 
+            <input type="text" name="email" placeholder="Email" class="feedback-input"/> 
+            <textarea type="text" name="message" placeholder="Message" class="feedback-input"></textarea>
+            <button type="submit" class="feed-button">Send</button>
+        </form>        
     </div>
-
-    <div id="feedback-main" style="z-index: 3;  display: none">
-        <div id="feedback-div" >
+    <div id="feedback-main" class="overlay" style="z-index: 3;  display: none">
+        <div id="feedback-div" class="inner-div">
             <div class="feedback-form" id="feedback-divi">
-              <input type="text" placeholder="Route" id="input_area" type="name" class="feedback-input" >
-              <input type="text" id="input_routenumber" class="feedback-input" placeholder="#" style="width: 45%;"><input type="text" id="input_cartodb_id" class="feedback-input" placeholder="ID e.g. 31" required="required" style="width: 45%; float: right;">
-              <div class="feedback-submit">
-                  <input type="submit" value="Send Error" onclick="return send()" class="feed-button">
-              </div>
+                <input type="text" placeholder="Route" id="input_area" type="name" class="feedback-input" >
+                <input type="text" id="input_routenumber" class="feedback-input" placeholder="#" style="width: 45%;"><input type="text" id="input_cartodb_id" class="feedback-input" placeholder="ID e.g. 31" required="required" style="width: 45%; float: right;">
+                <input type="submit" value="Send Error" onclick="return send()" class="feed-button">
             </div>
         </div>
     </div>
-    <div id="success-main" style="z-index: 3; display: none">
-        <div id="success-div">Data sent. Thank you.</div>
+    <div id="mass-send" class="overlay" style="z-index: 3;  display: none"> 
+        <div id="feedback-div" class="inner-div"> Add
+            <div class="feedback-form" id="feedback-divi" style="margin-top: 15px;">
+                <input type="text" placeholder="Route" id="mass_area" type="name" class="feedback-input" >
+                <input type="text" id="mass_routenumber" class="feedback-input" placeholder="#" style="width: 100%; margin-bottom: 15px;"> 
+                To the stops: 
+                <input type="text" id="input_cartodb_id1" class="feedback-input" placeholder="ID e.g. 31" required="required" style="width: 100%; margin-top: 15px;">
+                <input type="text" id="input_cartodb_id2" class="feedback-input" placeholder="ID e.g. 181" required="required" style="width: 100%;">
+                <input type="text" id="input_cartodb_id3" class="feedback-input" placeholder="ID e.g. 49" style="width: 100%; ">
+                <input type="text" id="input_cartodb_id4" class="feedback-input" placeholder="ID e.g. 18" style="width: 100%; ">
+                <input type="text" id="input_cartodb_id5" class="feedback-input" placeholder="ID e.g. 57"  style="width: 100%; ">              
+                <input type="button" id="submitmass" value="Save" onclick="return mass_query()" class="feed-button">
+            </div>
+        </div>
     </div>
-    <div id="results-main" style="z-index: 3; display: none">
-        <div id="no-results">No Results</div>
+    <div id="success-main" class="overlay" style="z-index: 3; display: none">
+        <div id="success-div" class="inner-div">Data sent. Thank you.</div>
     </div>
-    <a id="popup" class="feedback-button" href="mailto:tuliasubs@gmail.com" style="text-decoration:none;">contact</a>
+    <div id="results-main" class="overlay" style="z-index: 3; display: none">
+        <div id="no-results" class="inner-div">No Results</div>
+    </div>
+    <div id="contact-box" class="popup">
+        <button id="mail" class="btn_mail" onclick="location.href='mailto:rutemap@outlook.com';" ></button>     
+        <button id="netlify-button" class="net-button" onclick="return toggle_netlify()">contact</button>
+    </div>
+
     <script src="./main.js"></script>
 </body>
 </html>

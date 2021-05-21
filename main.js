@@ -14,6 +14,7 @@ let map = L.map('map', {
 	layers: [transport],
 });
 
+// Map panes for toggling route layers
 
 var carto_pane = map.createPane('cpane');
 map.getPane('cpane').style.zIndex = 550;
@@ -23,6 +24,7 @@ var result_pane = map.createPane('rpane');
 map.getPane('rpane').style.zIndex = 650;
 map.getPane('rpane').style.pointerEvents = 'none'; 
 
+// Map layers
 
 let baseMaps = {
 	"Roads": transport,
@@ -39,17 +41,7 @@ L.control.layers(baseMaps, overlayMaps, {
 	collapsed: false
 }).addTo(map);
 
-if (L.Browser.mobile) {
-   // map.addControl(L.control.attribution({position: 'topright'}))
-}
-
 // Location
-
-map.locate({
-	setView: true,
-	maxZoom: 16,
-	enableHighAccuracy: true
-});
 
 function onLocationFound(e) {
 	var radius = e.accuracy;
@@ -62,6 +54,23 @@ function onLocationError(e) {
 }
 
 map.on('locationerror', onLocationError);
+
+var find = L.easyButton({
+	id: "locationbtn",
+	leafletClasses: true, 
+	position: 'topright',
+	states: [{
+		title: 'find my location',
+		icon: 'icons/flag-solid.svg', 
+		onClick: function(){
+			map.locate({
+				setView: true,
+				maxZoom: 16,
+				enableHighAccuracy: true
+			});
+		}
+	}]
+}).addTo(map);
 
 // Draw
 
@@ -121,26 +130,25 @@ map.addEventListener("draw:deletestop", function (e) {
 	drawControl.addTo(map);
 });
 
+// Flag button to report route
+
 var flag = L.easyButton({
 	id: "flagbtn",
-	leafletClasses: true,   
+	leafletClasses: true,  
 	states: [{
 		title: 'flag a route as incorrect',
-		icon: '<i class="fas fa-flag"></i>', 
+		icon: 'icons/flag-solid.svg', 
 		onClick: function(){
-			toggle_visibility()
+			toggle_flag()
 		}
 	}]
 }).addTo(map);
 
-// Feedback
+// Flag form to report route
 
-function toggle_visibility() {
+function toggle_flag() {
 	var e = document.getElementById('feedback-main');
-	if(e.style.display == 'block')
-		e.style.display = 'none';
-	else
-		e.style.display = 'block';
+	toggle(e)
 }
 
 function send() {
@@ -151,11 +159,13 @@ function send() {
 	const route = enteredArea + " Route " + enteredNumber
 
 	query = "SELECT * FROM errors('" + route + "', " + enteredID + ")";
-	experi();
+	send_query();
 
-	off()
+	document.getElementById("feedback-div").style.display = "none";
 
 }
+
+// Busstop Icons
 
 var stopicon = L.icon({
 	iconUrl: "./icons/bus.png",
@@ -202,7 +212,7 @@ fetchroutes()
 
 const popupContent =
 	'<form>' +
-	'<br><input type="text" id="input_area" placeholder="Route" style="width: 100%;"><br>' +
+	'<br><input type="text" id="input_area" placeholder="Route" style="width: 80%;"><input type="button" onclick="return toggle_mass()" title="add route to multiple stops" class="btn_plus" style="width: 12%;" id="morearea">'+
 	'<br><input type="text" id="input_routenumber" placeholder="#" style="width: 35%;"><input type="text" id="input_cartodb_id" placeholder="ID (top-left)" required="required" style="width: 55%;"><br>' +
 	'<input type="button" value="Save" style="width: 100%;" id="submitrest">' +
 	'</form>'
@@ -210,12 +220,13 @@ const popupContent =
 const popupName = 
 	"<br><b>Contribute a route</b><br>" +
 	'<form >' +
-	'<br><input type="text" id="input_name" placeholder="Stop Name" style="width: 100%;"><br>' +
+	'<br><input type="text" id="input_name" placeholder="Stop Name" style="width: 100%;"><input type="button" onclick="return toggle_mass()" title="add route to multiple stops" class="btn_plus" style="width: 12%;" id="morearea">' +
 	'<br><input type="text" id="input_area" placeholder="Route" style="width: 100%;"><br>' +
 	'<br><input type="text" id="input_routenumber" placeholder="#" style="width: 35%;"><input type="text" id="input_cartodb_id" placeholder="ID (top-left)" required="required" style="width: 55%;"><br>' +
 	'<input type="button" value="Save" style="width: 100%;" id="submitall">' +
 	'</form>'
 
+// Carto Data in popup
 
 function addPopup(feature, layer) {
 
@@ -270,10 +281,11 @@ function addPopup(feature, layer) {
 	} 
 };
 
+// Sending data to Carto
 
 function setData(e) {
     
-	if (e.target && e.target.id == "submit" || e.target && e.target.id == "submitrest" || e.target && e.target.id == "submitall"  || e.target && e.target.id == "testbtn")  {
+	if (e.target && e.target.id == "submit" || e.target && e.target.id == "submitrest" || e.target && e.target.id == "submitall")  {
 
 		const enteredArea = document.getElementById("input_area").value;
 		const enteredNumber = document.getElementById("input_routenumber").value;
@@ -288,7 +300,7 @@ function setData(e) {
 				let drawing = JSON.stringify(layer.toGeoJSON().geometry);
 
 				query = "SELECT * FROM stops_complete('" + drawing + "', '" + enteredStopname +"','" + route +"')"
-				experi();
+				send_query();
 
             	// Transfer submitted drawing to the CARTO layer
 				let newData = layer.toGeoJSON();
@@ -302,7 +314,6 @@ function setData(e) {
 							onEachFeature: addPopup
 						}).addTo(cartoData);
 
-				// Clear drawn items layer
 			}); 
 
 		} else if (e.target && e.target.id == "submitrest") {
@@ -312,7 +323,7 @@ function setData(e) {
 			cartoData.eachLayer(function (layer) {
 				
 				query = "SELECT * FROM route_func('" + route + "', " + enteredID + ")";
-				experi()
+				send_query()
 
 			})
 		} else if (e.target && e.target.id == "submitall") {
@@ -323,58 +334,90 @@ function setData(e) {
 				const enteredStopname = document.getElementById("input_name").value;
 				
 				query = "SELECT * FROM names_route('" + route + "', '" + enteredStopname + "', " + enteredID + ")";
-				experi()
+				send_query()
 			})
 		} 
 	}
-
 }
 
-function experi() {
-	if (document.getElementById("input_area").value == '' || document.getElementById("input_routenumber").value == '') {
-		alert("Please fill in all the fields.")
+function mass_query() {
+	
+	const enteredArea = document.getElementById("mass_area").value;
+	const enteredNumber = document.getElementById("mass_routenumber").value;
+	
+	const route = enteredArea + " Route " + enteredNumber;
+
+	const id1 = document.getElementById("input_cartodb_id1").value;
+	const id2 = document.getElementById("input_cartodb_id2").value; 
+var foo = "test";
+	if ("input_cartodb_id3" > 0) {
+		let id3 = document.getElementById("input_cartodb_id3").value;
+
+		console.log(foo); // Interviewer: "What does this alert?" Answer: "test"
+		var foo = "bar";
+
+	} 
+	console.log(foo); //
+	const id4 = document.getElementById("input_cartodb_id4").value;
+	const id5 = document.getElementById("input_cartodb_id5").value;
+
+	query = "SELECT * FROM mass_func('" + route + "', " + id1 + id2 + id3 + id4 + id5 + ")";
+	to_carto()
+	toggle_mass()
+
+	// haven't checked what happens if user doesn't put in five IDs
+}
+
+function to_carto() {
+	if (confirm('Ready to Save?')) {
+		fetch(url1, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/x-www-form-urlencoded"
+			},
+			body: "q=" + encodeURI(query)
+		})
+			.then(response => {
+				if (!response.ok) throw response;
+				return response.json()
+			})
+			.then(function (data) {
+			
+				on();
+				cartoData.clearLayers();
+
+				drawnItems.closePopup()
+				drawnItems.clearLayers()
+
+				fetchroutes();
+			})
+			.catch((error) => {
+				if (error.json) {
+					error.json().then((body) => {
+						error1 = JSON.stringify(body)
+						error2 = error1.replace('{', '').replace('}', '').replace('"', '');
+
+						alert("Error saving data: " + error2);
+					});						
+				} else {
+					alert("Error saving data");
+					
+				}
+				
+				return false;
+			})
+			
+	} 
+	return false;	
+}
+
+function send_query() {
+	// Why isn't it reading mass_query's inputs?
+	if (document.getElementById("input_area").value == '' || document.getElementById("input_routenumber").value == '' ) {
+		alert("Please fill in all the .")
 		return true;
 	} else {
-		if (confirm('Ready to Save?')) {
-			fetch(url1, {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/x-www-form-urlencoded"
-				},
-				body: "q=" + encodeURI(query)
-			})
-				.then(response => {
-					if (!response.ok) throw response;
-					return response.json()
-				})
-				.then(function (data) {
-				
-					on();
-					cartoData.clearLayers();
-
-					drawnItems.closePopup()
-					drawnItems.clearLayers()
-
-					fetchroutes();
-				})
-				.catch((error) => {
-					if (error.json) {
-						error.json().then((body) => {
-							error1 = JSON.stringify(body)
-							error2 = error1.replace('{', '').replace('}', '').replace('"', '');
-
-							alert("Error saving data: " + error2);
-						});						
-					} else {
-						alert("Error saving data");
-						
-					}
-					
-					return false;
-				})
-				
-		} 
-		return false;
+		to_carto()
 	} 
 }
 
@@ -391,7 +434,9 @@ function createFormPopup() {
 	drawnItems.bindPopup(popupContent, {keepInView: true}).openPopup();
 }
 
-// Search 
+// Search Bar / Index
+
+var resultjson = L.layerGroup().addTo(map);
 
 function searchRoutes(data) {
 
@@ -402,7 +447,7 @@ function searchRoutes(data) {
 			return L.marker(latlng, { icon: resulticon, pane: 'rpane'}, 
 			map.flyTo(latlng, 14, {
 				animate: true,
-				duration: 1 // in seconds                                                
+				duration: 1                                               
 			}));
     },
 		onEachFeature: addPopup
@@ -412,16 +457,37 @@ function searchRoutes(data) {
 	setTimeout(function() { carto_pane.style.display = 'block'; }, 30000);
 }
 
-let resultjson = L.layerGroup().addTo(map);
+function returned_data(data) {
 
-let search_function = (function() {
-	let text = $('#text_').val();
-	let number = $('#number_').val();
-	let searchitem = text + " Route " + number;
+	lele = JSON.stringify(data)
+	
+	if (lele.length > 50) {
+		searchRoutes(data)
+	} else {
+		
+		document.getElementById("results-main").style.display = "block";
+		setTimeout(function () { $('#results-main').fadeOut('fast'); }, 6000);	
+	}
+}
 
-	let sql = 
+var search_function = (function() {
+
+	var searchselect = $('#search-select').val();
+	var searchtype = $('#text_').val();
+
+	if (searchtype !== "") {
+		var text = searchtype
+		console.log(text)
+	} else {
+		var text = searchselect
+	}
+
+	var number = $('#search-number').val();
+	var searchitem = text + " Route " + number;
+
+	var sql = 
 	"SELECT points.cartodb_id, route.the_geom, route.route1, route.route2, route.route3, names.name AS stopname FROM points INNER JOIN route ON route.the_geom = points.the_geom INNER JOIN names ON points.the_geom = names.the_geom WHERE route1 ilike '" + searchitem + "' OR route2 ilike '" + searchitem + "' OR route3 ilike '" + searchitem + "'";
-	let sqltext = "SELECT points.cartodb_id, route.the_geom, route.route1, route.route2, route.route3, names.name AS stopname FROM points INNER JOIN route ON route.the_geom = points.the_geom INNER JOIN names ON points.the_geom = names.the_geom WHERE CONCAT(route1, '', route2, '', route3) ILIKE '%" + text + "%'";
+	var sqltext = "SELECT points.cartodb_id, route.the_geom, route.route1, route.route2, route.route3, names.name AS stopname FROM points INNER JOIN route ON route.the_geom = points.the_geom INNER JOIN names ON points.the_geom = names.the_geom WHERE CONCAT(route1, '', route2, '', route3) ILIKE '%" + text + "%'";
 
 	if (text && number) {
 		if (true) {
@@ -438,17 +504,7 @@ let search_function = (function() {
 				.then((response) => response.json())
 
 				.then(function (data) {
-
-					lele = JSON.stringify(data)
-
-					if (lele.length > 50) {
-						searchRoutes(data)
-					} else {
-						// fetchroutes();
-						
-						document.getElementById("results-main").style.display = "block";
-						setTimeout(function () { $('#results-main').fadeOut('fast'); }, 6000);	
-					}
+					returned_data(data)
 				})
 
 			return false
@@ -468,17 +524,7 @@ let search_function = (function() {
 				.then((response) => response.json())
 
 				.then(function (data) {
-
-					lele = JSON.stringify(data)
-
-					if (lele.length > 50) {
-						searchRoutes(data)
-					} else {
-						// fetchroutes();
-						
-						document.getElementById("results-main").style.display = "block";
-						setTimeout(function () { $('#results-main').fadeOut('fast'); }, 4000);	
-					}
+					returned_data(data)
 				}) 
 			return false
 		}
@@ -498,10 +544,29 @@ function on() {
 	setTimeout(function () { $('#success-main').fadeOut('fast'); }, 4000);	
 }
 
-on()
+document.getElementById("success-main").style.display = "none";
+document.getElementById("form-div").style.display = "none";
 
-function off() {
-	document.getElementById("feedback-div").style.display = "none";
+// Show HTML Forms
+
+function toggle(e) {
+	if(e.style.display == 'block')
+		e.style.display = 'none';
+	else
+		e.style.display = 'block';	
 }
 
-document.getElementById("success-main").style.display = "none";
+function toggle_netlify() {
+	var e = document.getElementById('form-div');
+	toggle(e)
+}
+
+function toggle_mass() {
+	var e = document.getElementById('mass-send');
+	toggle(e)
+}
+
+function search_bar() {
+	document.getElementById("search-select").style.display = "none";
+	document.getElementById("search-type").style.display = "block";
+}
