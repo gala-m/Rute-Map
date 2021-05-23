@@ -151,6 +151,8 @@ function toggle_flag() {
 	toggle(e)
 }
 
+/* Unnecessary?
+
 function send() {
 	const enteredArea = document.getElementById("input_area").value;
 	const enteredNumber = document.getElementById("input_routenumber").value;
@@ -163,7 +165,9 @@ function send() {
 
 	document.getElementById("feedback-div").style.display = "none";
 
-}
+} 
+
+*/
 
 // Busstop Icons
 
@@ -218,8 +222,7 @@ const popupContent =
 	'</form>'
 
 const popupName = 
-	"<br><b>Contribute a route</b><br>" +
-	'<form >' +
+	'<form>' +
 	'<br><input type="text" id="input_name" placeholder="Stop Name" style="width: 100%;"><input type="button" onclick="return toggle_mass()" title="add route to multiple stops" class="btn_plus" style="width: 12%;" id="morearea">' +
 	'<br><input type="text" id="input_area" placeholder="Route" style="width: 100%;"><br>' +
 	'<br><input type="text" id="input_routenumber" placeholder="#" style="width: 35%;"><input type="text" id="input_cartodb_id" placeholder="ID (top-left)" required="required" style="width: 55%;"><br>' +
@@ -287,129 +290,133 @@ function setData(e) {
     
 	if (e.target && e.target.id == "submit" || e.target && e.target.id == "submitrest" || e.target && e.target.id == "submitall")  {
 
-		const enteredArea = document.getElementById("input_area").value;
-		const enteredNumber = document.getElementById("input_routenumber").value;
-		
-		const route = enteredArea + " Route " + enteredNumber;
+		if (confirm('Ready to Save?')) { 
 
-		if (e.target && e.target.id == "submit") {
+			const enteredArea = document.getElementById("input_area").value;
+			const enteredNumber = document.getElementById("input_routenumber").value;
+			
+			const route = enteredArea + " Route " + enteredNumber;
 
-			drawnItems.eachLayer(function (layer) {
+			switch(e.target && e.target.id) {
+				case "submit" :
+					drawnItems.eachLayer(function (layer) {
 
-				const enteredStopname = document.getElementById("input_name").value;
-				let drawing = JSON.stringify(layer.toGeoJSON().geometry);
+						const enteredStopname = document.getElementById("input_name").value;
+						let drawing = JSON.stringify(layer.toGeoJSON().geometry);
 
-				query = "SELECT * FROM stops_complete('" + drawing + "', '" + enteredStopname +"','" + route +"')"
-				send_query();
+						query = "SELECT * FROM stops_complete('" + drawing + "', '" + enteredStopname +"','" + route +"')"
+						send_query();
 
-            	// Transfer submitted drawing to the CARTO layer
-				let newData = layer.toGeoJSON();
-				newData.properties.description = enteredStopname;
-				newData.properties.name = enteredArea;
-				newData.properties.name = enteredNumber;
-				L.geoJSON(newData, {
+						// Transfer submitted drawing to the CARTO layer
+						let newData = layer.toGeoJSON();
+						newData.properties.description = enteredStopname;
+						newData.properties.name = enteredArea;
+						newData.properties.name = enteredNumber;
+						L.geoJSON(newData, {
 							pointToLayer: function (feature, latlng) {
 								return L.marker(latlng, { icon: stopicon }); 
 							},
 							onEachFeature: addPopup
 						}).addTo(cartoData);
+					});
+					break;
+				case "submitrest" :
+					
+					const enteredID = document.getElementById("input_cartodb_id").value;
 
-			}); 
+					cartoData.eachLayer(function (layer) {
+						
+						query = "SELECT * FROM route_func('" + route + "', " + enteredID + ")";
+						send_query()
 
-		} else if (e.target && e.target.id == "submitrest") {
-			
-			const enteredID = document.getElementById("input_cartodb_id").value;
+					})
+					break;
+				case "submitall" :
 
-			cartoData.eachLayer(function (layer) {
-				
-				query = "SELECT * FROM route_func('" + route + "', " + enteredID + ")";
-				send_query()
+					cartoData.eachLayer(function (layer) {
 
-			})
-		} else if (e.target && e.target.id == "submitall") {
+						const enteredID = document.getElementById("input_cartodb_id").value;
+						const enteredStopname = document.getElementById("input_name").value;
+						
+						query = "SELECT * FROM names_route('" + route + "', '" + enteredStopname + "', " + enteredID + ")";
+						send_query()
+					})
+					break;
+			} 
 
-			cartoData.eachLayer(function (layer) {
-
-				const enteredID = document.getElementById("input_cartodb_id").value;
-				const enteredStopname = document.getElementById("input_name").value;
-				
-				query = "SELECT * FROM names_route('" + route + "', '" + enteredStopname + "', " + enteredID + ")";
-				send_query()
-			})
-		} 
+		}
 	}
 }
 
 function mass_query() {
-	
-	const enteredArea = document.getElementById("mass_area").value;
-	const enteredNumber = document.getElementById("mass_routenumber").value;
-	
-	const route = enteredArea + " Route " + enteredNumber;
 
-	const id1 = document.getElementById("input_cartodb_id1").value;
-	const id2 = document.getElementById("input_cartodb_id2").value; 
-var foo = "test";
-	if ("input_cartodb_id3" > 0) {
-		let id3 = document.getElementById("input_cartodb_id3").value;
+	if (confirm('Ready to Save?')) {	
+		const enteredArea = document.getElementById("mass_area").value;
+		const enteredNumber = document.getElementById("mass_routenumber").value;
+		const route = enteredArea + " Route " + enteredNumber;
 
-		console.log(foo); // Interviewer: "What does this alert?" Answer: "test"
-		var foo = "bar";
+		var e = document.getElementById("for-counter");
+		var inputs = e.getElementsByTagName("input");
 
-	} 
-	console.log(foo); //
-	const id4 = document.getElementById("input_cartodb_id4").value;
-	const id5 = document.getElementById("input_cartodb_id5").value;
+		for (var i = 0; i < inputs.length;   i ++) {
 
-	query = "SELECT * FROM mass_func('" + route + "', " + id1 + id2 + id3 + id4 + id5 + ")";
-	to_carto()
-	toggle_mass()
+			if ( inputs[i].value!== '') {
+				query = "SELECT * FROM route_func('" + route + "', " +  inputs[i].value + ")";
+				console.log(query)			
+			}
+			to_carto()
 
-	// haven't checked what happens if user doesn't put in five IDs
+		}
+		toggle_mass()				
+	}	
+
 }
 
 function to_carto() {
-	if (confirm('Ready to Save?')) {
-		fetch(url1, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/x-www-form-urlencoded"
-			},
-			body: "q=" + encodeURI(query)
+	fetch(url1, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/x-www-form-urlencoded"
+		},
+		body: "q=" + encodeURI(query)
+	})
+		.then(response => {
+			if (!response.ok) throw response;
+			return response.json()
 		})
-			.then(response => {
-				if (!response.ok) throw response;
-				return response.json()
-			})
-			.then(function (data) {
-			
-				on();
-				cartoData.clearLayers();
+		.then(function (data) {
+		
+			on();
+			cartoData.clearLayers();
 
-				drawnItems.closePopup()
-				drawnItems.clearLayers()
+			drawnItems.closePopup()
+			drawnItems.clearLayers()
 
-				fetchroutes();
-			})
-			.catch((error) => {
-				if (error.json) {
-					error.json().then((body) => {
-						error1 = JSON.stringify(body)
-						error2 = error1.replace('{', '').replace('}', '').replace('"', '');
+			fetchroutes();
+		})
+		.catch((error) => {
+			if (error.json) {
+				error.json().then((body) => {
+					error1 = JSON.stringify(body)
+					error2 = error1.replace('{', '').replace('}', '').replace('"', '');
 
-						alert("Error saving data: " + error2);
-					});						
-				} else {
-					alert("Error saving data");
-					
-				}
+					alert("Error saving data: " + error2);
+				});						
+			} else {
+				alert("Error saving data");
 				
-				return false;
-			})
+			}
 			
-	} 
-	return false;	
+			return false;
+		})
+			
 }
+
+$(".feedback-input").keyup(function () {
+    if (this.value.length == this.maxLength) {
+      $(this).next('.feedback-input').focus();
+    }
+})
 
 function send_query() {
 	// Why isn't it reading mass_query's inputs?

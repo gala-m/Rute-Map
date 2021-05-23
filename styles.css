@@ -124,7 +124,7 @@ input[id=text_]:focus, input[id=number_]:focus {
   padding-bottom: 22px;
 }
 
-.feedback-input {
+.feedback-input, .input-next {
   color: #000;
   font-weight: 500;
   font-size: 17px;
@@ -140,7 +140,7 @@ input[id=text_]:focus, input[id=number_]:focus {
   border-bottom: 1px solid #000000;
 }
 
-.feedback-input:focus {
+.feedback-input:focus, .input-next:focus {
     box-shadow: 0;
     border: none;
     border-bottom: 3px solid #020268;
