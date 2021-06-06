@@ -265,6 +265,16 @@ input:focus{
     float: right
 }
 
+#close {
+    float: right;
+    display: block;
+    padding: 2px 7px;
+    background: #cccccc38;
+    position: relative;
+    top: -32px;
+    color: #020268;
+}
+
 @media only screen and (min-width: 630px) {
     /* For Desktop*/
 

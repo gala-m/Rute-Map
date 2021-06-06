@@ -72,6 +72,51 @@ var find = L.easyButton({
 	}]
 }).addTo(map);
 
+var GeoSearchControl = window.GeoSearch.GeoSearchControl;
+var OpenStreetMapProvider = window.GeoSearch.OpenStreetMapProvider;
+
+const provider = new OpenStreetMapProvider({
+	params: {
+		email: 'tuliasubs@gmail.com', 
+		countrycodes: 'bw'
+	}
+});
+
+const searchControl = new GeoSearchControl({
+  provider: provider,
+  style: 'button', 
+  showMarker: true, // optional: true|false  - default true
+  showPopup: false, // optional: true|false  - default false
+  marker: {
+    // optional: L.Marker    - default L.Icon.Default
+    icon: new L.Icon.Default(),
+    draggable: false,
+  },
+  popupFormat: ({ query, result }) => result.label, // optional: function    - default returns result label,
+  resultFormat: ({ result }) => result.label, // optional: function    - default returns result label
+  maxMarkers: 1, // optional: number      - default 1
+  retainZoomLevel: true, // optional: true|false  - default false
+  animateZoom: true, // optional: true|false  - default true
+  autoClose: false, // optional: true|false  - default false
+  searchLabel: 'Enter address', // optional: string      - default 'Enter address'
+  keepResult: false, // optional: true|false  - default false
+  updateMap: true, // optional: true|false  - default true
+  position: 'topright'
+});
+
+
+map.on('geosearch/showlocation', eve);
+
+function eve() {
+	
+	provider.search({ query: '...' }).then(function (result) {
+		console.log(result.display_name)
+	// do something with result;
+	});	
+}
+
+map.addControl(searchControl); 
+
 // Draw
 
 let drawnItems = L.featureGroup().addTo(map);
@@ -284,6 +329,13 @@ function addPopup(feature, layer) {
 	} 
 };
 
+var today = new Date();
+var year = today.getFullYear();
+var month = today.getMonth(); 
+var date = today.getDate();
+var hours = today.getHours()
+var submission_date = year + "-" + month + "-" + date + "-" + hours
+
 // Sending data to Carto
 
 function setData(e) {
@@ -304,7 +356,7 @@ function setData(e) {
 						const enteredStopname = document.getElementById("input_name").value;
 						let drawing = JSON.stringify(layer.toGeoJSON().geometry);
 
-						query = "SELECT * FROM stops_complete('" + drawing + "', '" + enteredStopname +"','" + route +"')"
+						query = "SELECT * FROM stops_complete('" + drawing + "', '" + enteredStopname +"','" + route +  "', '" + submission_date + "')"
 						send_query();
 
 						// Transfer submitted drawing to the CARTO layer
@@ -326,7 +378,7 @@ function setData(e) {
 
 					cartoData.eachLayer(function (layer) {
 						
-						query = "SELECT * FROM route_func('" + route + "', " + enteredID + ")";
+						query = "SELECT * FROM route_func('" + route + "', " + enteredID + ", '" + submission_date + "')";
 						send_query()
 
 					})
@@ -338,7 +390,7 @@ function setData(e) {
 						const enteredID = document.getElementById("input_cartodb_id").value;
 						const enteredStopname = document.getElementById("input_name").value;
 						
-						query = "SELECT * FROM names_route('" + route + "', '" + enteredStopname + "', " + enteredID + ")";
+						query = "SELECT * FROM names_route('" + route + "', '" + enteredStopname + "', " + enteredID +  ", '" + submission_date + "')";
 						send_query()
 					})
 					break;
@@ -361,7 +413,7 @@ function mass_query() {
 		for (var i = 0; i < inputs.length;   i ++) {
 
 			if ( inputs[i].value!== '') {
-				query = "SELECT * FROM route_func('" + route + "', " +  inputs[i].value + ")";
+				query = "SELECT * FROM route_func('" + route + "', " +  inputs[i].value +  ", '" + submission_date + "')";
 				console.log(query)			
 			}
 			to_carto()
@@ -395,21 +447,8 @@ function to_carto() {
 			fetchroutes();
 		})
 		.catch((error) => {
-			if (error.json) {
-				error.json().then((body) => {
-					error1 = JSON.stringify(body)
-					error2 = error1.replace('{', '').replace('}', '').replace('"', '');
-
-					alert("Error saving data: " + error2);
-				});						
-			} else {
-				alert("Error saving data");
-				
-			}
-			
-			return false;
+			alert("Your contribution can't be saved right now.");
 		})
-			
 }
 
 $(".feedback-input").keyup(function () {
@@ -419,9 +458,8 @@ $(".feedback-input").keyup(function () {
 })
 
 function send_query() {
-	// Why isn't it reading mass_query's inputs?
 	if (document.getElementById("input_area").value == '' || document.getElementById("input_routenumber").value == '' ) {
-		alert("Please fill in all the .")
+		alert("Please fill in all the fields.")
 		return true;
 	} else {
 		to_carto()
@@ -573,7 +611,16 @@ function toggle_mass() {
 	toggle(e)
 }
 
+$('select').on('change', function() {
+    var selected = this.value;
+	if (selected === "searchdata") {
+		document.getElementById("search-select").style.display = "none";
+		document.getElementById("search-type").style.display = "block";
+	}
+});
+
 function search_bar() {
-	document.getElementById("search-select").style.display = "none";
-	document.getElementById("search-type").style.display = "block";
+	document.getElementById("search-type").style.display = "none";
+	document.getElementById("search-select").style.display = "block";
+	
 }
