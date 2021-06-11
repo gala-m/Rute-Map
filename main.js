@@ -558,6 +558,7 @@ $('select').on('change', function() {
 });
 
 function search_bar() {
+	document.getElementById("text_").value = '';
 	document.getElementById("search-type").style.display = "none";
 	document.getElementById("search-select").style.display = "block";
 	
