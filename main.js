@@ -72,50 +72,6 @@ var find = L.easyButton({
 	}]
 }).addTo(map);
 
-var GeoSearchControl = window.GeoSearch.GeoSearchControl;
-var OpenStreetMapProvider = window.GeoSearch.OpenStreetMapProvider;
-
-const provider = new OpenStreetMapProvider({
-	params: {
-		email: 'tuliasubs@gmail.com', 
-		countrycodes: 'bw'
-	}
-});
-
-const searchControl = new GeoSearchControl({
-  provider: provider,
-  style: 'button', 
-  showMarker: true, // optional: true|false  - default true
-  showPopup: false, // optional: true|false  - default false
-  marker: {
-    // optional: L.Marker    - default L.Icon.Default
-    icon: new L.Icon.Default(),
-    draggable: false,
-  },
-  popupFormat: ({ query, result }) => result.label, // optional: function    - default returns result label,
-  resultFormat: ({ result }) => result.label, // optional: function    - default returns result label
-  maxMarkers: 1, // optional: number      - default 1
-  retainZoomLevel: true, // optional: true|false  - default false
-  animateZoom: true, // optional: true|false  - default true
-  autoClose: false, // optional: true|false  - default false
-  searchLabel: 'Enter address', // optional: string      - default 'Enter address'
-  keepResult: false, // optional: true|false  - default false
-  updateMap: true, // optional: true|false  - default true
-  position: 'topright'
-});
-
-
-map.on('geosearch/showlocation', eve);
-
-function eve() {
-	
-	provider.search({ query: '...' }).then(function (result) {
-		console.log(result.display_name)
-	// do something with result;
-	});	
-}
-
-map.addControl(searchControl); 
 
 // Draw
 
@@ -196,24 +152,6 @@ function toggle_flag() {
 	toggle(e)
 }
 
-/* Unnecessary?
-
-function send() {
-	const enteredArea = document.getElementById("input_area").value;
-	const enteredNumber = document.getElementById("input_routenumber").value;
-	const enteredID = document.getElementById("input_cartodb_id").value;
-			
-	const route = enteredArea + " Route " + enteredNumber
-
-	query = "SELECT * FROM errors('" + route + "', " + enteredID + ")";
-	send_query();
-
-	document.getElementById("feedback-div").style.display = "none";
-
-} 
-
-*/
-
 // Busstop Icons
 
 var stopicon = L.icon({
@@ -261,16 +199,16 @@ fetchroutes()
 
 const popupContent =
 	'<form>' +
-	'<br><input type="text" id="input_area" placeholder="Route" style="width: 80%;"><input type="button" onclick="return toggle_mass()" title="add route to multiple stops" class="btn_plus" style="width: 12%;" id="morearea">'+
-	'<br><input type="text" id="input_routenumber" placeholder="#" style="width: 35%;"><input type="text" id="input_cartodb_id" placeholder="ID (top-left)" required="required" style="width: 55%;"><br>' +
+	'<br><input type="text" id="input_area" placeholder="Route" style="width: 75%;"><input type="text" id="input_routenumber" placeholder="#" style="width: 20%; position: relative; right: -5px;"><br>' +
+	'<br><input type="text" id="input_cartodb_id" placeholder="ID (top-left)" required="required" style="width: 75%;"><input type="button" onclick="return toggle_mass()" title="add route to multiple stops?" class="btn_plus" style="width: 12%;" id="morearea">' +
 	'<input type="button" value="Save" style="width: 100%;" id="submitrest">' +
 	'</form>'
 
 const popupName = 
 	'<form>' +
-	'<br><input type="text" id="input_name" placeholder="Stop Name" style="width: 100%;"><input type="button" onclick="return toggle_mass()" title="add route to multiple stops" class="btn_plus" style="width: 12%;" id="morearea">' +
-	'<br><input type="text" id="input_area" placeholder="Route" style="width: 100%;"><br>' +
-	'<br><input type="text" id="input_routenumber" placeholder="#" style="width: 35%;"><input type="text" id="input_cartodb_id" placeholder="ID (top-left)" required="required" style="width: 55%;"><br>' +
+	'<br><input type="text" id="input_name" placeholder="Stop Name" style="width: 100%;"><br>' +
+	'<br><input type="text" id="input_area" placeholder="Route" style="width: 75%;"><input type="text" id="input_routenumber" placeholder="#" style="width: 20%; position: relative; right: -5px;"><br>' +
+	'<br><input type="text" id="input_cartodb_id" placeholder="ID (top-left)" required="required" style="width: 75%;"><input type="button" onclick="return toggle_mass()" title="add route to multiple stops?" class="btn_plus" style="width: 12%;" id="morearea">' +
 	'<input type="button" value="Save" style="width: 100%;" id="submitall">' +
 	'</form>'
 

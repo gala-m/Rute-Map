@@ -35,7 +35,7 @@
         <form id="search_container" class="search-container" method="post" onsubmit="return search_function()" style="z-index: 2">
             <div id="search-type" class="inner-container" style="z-index: 5; display: none">
                 <input type="text" id="text_" placeholder="search a route">   
-                <span id='close' onclick="return search_bar()"; return false;'>x</span>
+                <span id='close' onclick="return search_bar()"; return false;>x</span>
             </div>
             <select id="search-select" class="inner-container"  style="z-index: 5; display: block">
                 <option value="">   Show Route Index</option>
@@ -68,6 +68,7 @@
     </div>
     <div id="mass-send" class="overlay" style="z-index: 3;  display: none"> 
         <div id="feedback-div" class="inner-div"> Add
+            <span id='close-mass' style="top: 0px; cursor: pointer;" onclick="return toggle_mass()"; return false;>x</span>
             <div class="feedback-form" id="feedback-divi" style="margin-top: 15px;">
                 <input type="text" placeholder="Route" id="mass_area" type="name" class="feedback-input" >
                 <input type="text" id="mass_routenumber" class="feedback-input" placeholder="#" style="width: 100%; margin-bottom: 15px;"> 
