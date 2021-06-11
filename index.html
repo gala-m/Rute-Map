@@ -28,14 +28,14 @@
         <div id="logo"> 
             <img class="rlogo"
                 src="./icons/rute.svg"
-                alt="routemang logo"
+                alt="routemangulogo"
                 height="35px"
                 />
         </div>
         <form id="search_container" class="search-container" method="post" onsubmit="return search_function()" style="z-index: 2">
             <div id="search-type" class="inner-container" style="z-index: 5; display: none">
                 <input type="text" id="text_" placeholder="search a route">   
-                <span id='close' onclick="return search_bar()"; return false;>x</span>
+                <p LOgospan id='close' onclick="return search_bar()"; return false;>x</span>
             </div>
             <select id="search-select" class="inner-container"  style="z-index: 5; display: block">
                 <option value="">   Show Route Index</option>
@@ -48,7 +48,7 @@
                 <button id="btn_submit" type="submit" ></button>
         </form>         
     </nav>
-    <div id="form-div" class="overlay" style="z-index: 5; display: none">
+    <div id="form-div" class="c-overlay" style="z-index: 5; display: none">
         <form id="form-contact" method="POST" data-netlify="true" class="netlify-form">
             <input type="text" name="name" placeholder="Name" class="feedback-input"/> 
             <input type="text" name="email" placeholder="Email" class="feedback-input"/> 

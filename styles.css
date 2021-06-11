@@ -207,11 +207,6 @@ input:focus{
 
 /* Contact box */
 
-.netlify-form {
-    background-color: #fbfbfb;
-    z-index: 3000;
-}
-
 .net-button {
     cursor: pointer;
     background: none;
@@ -271,6 +266,22 @@ input:focus{
     color: #020268;
 }
 
+.netlify-form {
+    background-color: rgb(255, 255, 255);
+    padding: 15px;
+    width: 200px;
+    float: left;
+    left: 50%;
+    position: absolute;
+    margin-top: 30px;
+    margin-left: -260px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.2);
+    z-index: 3000;
+}
+
 @media only screen and (min-width: 630px) {
     /* For Desktop*/
 
@@ -301,7 +312,7 @@ input:focus{
         top: 10px;
     }
 
-    .overlay {
+    .overlay, .c-overlay {
         position: fixed;
         float: left;
         top: 22%;
@@ -401,10 +412,17 @@ input:focus{
         color:  rgba(2, 2, 104, 1);
     }
 
-    .overlay {
-        position: absolute;
+    .c-overlay {
+        position: fixed;
         top: 11%;
-        left: 15px;
+        left: 200px;
+        width: 200px;
+        display: none;
+    }
+    .overlay {
+        position: fixed;
+        top: 11%;
+        left: 25%;
         width: 200px;
         display: none;
     }
