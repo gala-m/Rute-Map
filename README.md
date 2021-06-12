@@ -5,7 +5,7 @@ The next stage is enabling dynamic routing when searching a route, to replace th
 
 # Contributing
 Contributions, bug reports and pull requests are welcome.  
-On the site, verify routes and flag mistakes or false information.  
+On the site, verifing routes and flagging mistakes or false information is very helpful.  
 
 # Questions
-For questions, community help and discussions you can use the discussions forum
+For questions and feedback you can use the discussions forum.
