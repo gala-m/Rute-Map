@@ -51,9 +51,10 @@ input[id=text_]:focus, input[id=number_]:focus {
 .search {
     padding-left: 10px;
     padding-right: 5px;
+    background-color: #fbfbfb;
     font-size: 17px;
     border: none;
-    height: 44px;
+    height: 42px;
     width: 70px;
     overflow: hidden;
     resize: none;
@@ -64,16 +65,14 @@ input[id=text_]:focus, input[id=number_]:focus {
 }
 
 .inner-container {
-    background-color: rgb(255, 255, 255);
+    background-color: #fdfdfc;
     color: gray;
     border-radius: 5px;
-    border-top: 2px solid #020268;
-    height: 44px;
+    height: 42px;
     position: fixed;
     width: 200px;
     width: 150px;
     border: none;
-    border-left: 0.5px solid #80808078;
     cursor: pointer;
     padding-left: 5px;
 }
@@ -175,34 +174,31 @@ input:focus{
   background-color: white;
 }
 
-#testbtn {
-    background: none;
-    border: none;
-    color: rgb(170, 3, 3);
-    cursor: pointer;
-    float: right;
+
+#flagbtn, #locationbtn, #mailbtn {
+    background-size: 300px 15px;
+    background-color: #fdfdfc;
 }
 
 #flagbtn {
-    background-size: 300px 15px;
     background-image: linear-gradient(transparent, transparent), url('./icons/flag-solid.svg');
-    background-color: rgb(255, 255, 255);
-    color: rgb(170, 3, 3);
 }
 
 #locationbtn {
-    background-size: 300px 15px;
     background-image: linear-gradient(transparent, transparent), url('./icons/compass-solid.svg');
-    background-color: rgb(255, 255, 255);
-    color: rgb(170, 3, 3);
 }
 
-#logo {
-    color: rgb(170, 3, 3);
+#mailbtn {
+    background-image: linear-gradient(transparent, transparent), url('./icons/envelope-solid.svg');
 }
 
-.resulticon {
-    color: #020268;
+
+#flagbtn:hover, #locationbtn:hover, #mailbtn:hover {
+    background-color: #8d8d8d48;
+}
+
+.shadow {
+  filter: drop-shadow( 0 0 5px #8b7c6f );
 }
 
 /* Contact box */
@@ -256,7 +252,7 @@ input:focus{
     float: right
 }
 
-#close, #close-mass {
+#close, .close-mass {
     float: right;
     display: block;
     padding: 2px 7px;
@@ -271,7 +267,7 @@ input:focus{
     padding: 15px;
     width: 200px;
     float: left;
-    left: 50%;
+    left: 35%;
     position: absolute;
     margin-top: 30px;
     margin-left: -260px;
@@ -282,34 +278,72 @@ input:focus{
     z-index: 3000;
 }
 
+#nav-bar {
+    border-bottom: 1px solid #0202683d;
+    background-color: #fdfdfc;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.1);
+    height: 45px;
+    width: auto;
+    position: fixed;
+    left: 20px;
+    top: 10px;
+    padding: 5px
+}
+
 @media only screen and (min-width: 630px) {
     /* For Desktop*/
+
+    #flagbtn {
+        margin-top: 30px;
+    }
+
+    #mailbtn, #locationbtn {
+        margin-top: 10px;
+    }
+
+    .leaflet-draw.leaflet-control {
+        margin-top: 30px;
+    }
+    .leaflet-top {
+        top: 60px;
+        }
+
+    .leaflet-top.leaflet-right {
+        top: 80px
+    }
+
+    #bar {
+        position: absolute;
+        width: 30px;
+        right: 10px;
+        background-color: #fdfdfc;
+        padding: 10px;
+        z-index: 700;
+        top: 10px;
+        border-top-right-radius: 5px;
+        margin-bottom: 15px;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.09);
+        border-top-left-radius: 5px;
+        height: 95%;
+    }
 
     .rlogo {
         padding: 4px;
         padding-left: 8px;
     }
 
-    #nav-bar {
-        background-color: rgb(255, 255, 255);
-        border-radius: 5px;
-        border-bottom: 2px solid #020268;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.08);
-        height: 45px;
-        width: calc(100% - 250px);
-        position: fixed;
-        right: 150px;
-        top: 10px;
-    }
-
     .search-container {
-        background-color: rgb(255, 255, 255);
-        border-radius: 5px;
+        background-color: #fdfdfc;
         height: 43px;
         width: 300px;
         position: fixed;
-        right: 150px;
+        right: 10px;
         top: 10px;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.09);
+        border-top-right-radius: 5px;
+        border-top-left-radius: 5px;
     }
 
     .overlay, .c-overlay {
@@ -339,15 +373,14 @@ input:focus{
         margin: 12px;
         margin-right: 15px;
         float: right;
-        background-color: rgb(255, 255, 255);
+        background-color: #fdfdfc;
         font-size: 15px;
         border: none;
         cursor: pointer;
         border-radius: 0 3px 3px 0;
         height: 20px;
         width: 20px;
-        
-
+    
     }
 
 }
@@ -355,16 +388,8 @@ input:focus{
 @media only screen and (max-width: 629px) {
     /* For Phones*/
 
-    #nav-bar {
-        background-color: rgb(255, 255, 255);
-        border-radius: 5px;
-        border-bottom: 2px solid #020268;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.08);
-        height: 45px;
-        width: calc(100% - 160px);
-        position: fixed;
-        left: 15px;
-        top: 10px;
+    .leaflet-top .leaflet-control {
+        margin-top: 10px;
     }
 
     .rlogo {
@@ -372,19 +397,18 @@ input:focus{
         margin-left: auto;
         margin-right: auto;
         padding-top: 4px;
-
     }
 
     .search-container {
-        background-color: rgb(255, 255, 255);
-        border-radius: 5px;
-        border-top: 2px solid #020268;
-        box-shadow: 0 1px 5px rgba(0,0,0,0.08);
+        background-color: #fdfdfc;
+        border-bottom-left-radius: 5px;
+        border-bottom-right-radius: 5px;
+        box-shadow: 0 1px 5px rgba(0,0,0,0.09);
         height: 44px;
         position: fixed;
-        left: 15px;
-        right: 10px;
-        bottom: 30px;
+        left: 20px;
+        right: 20px;
+        bottom: 20px;
     }
 
     input[id="number_"] {
@@ -402,7 +426,7 @@ input:focus{
         background: url(icons/search-solid.svg) no-repeat;
         margin: 12px;
         float: right;
-        background-color: rgb(255, 255, 255);
+        background-color: #fdfdfc;
         font-size: 15px;
         border: none;
         cursor: pointer;
@@ -422,7 +446,7 @@ input:focus{
     .overlay {
         position: fixed;
         top: 11%;
-        left: 25%;
+        left: 3%;
         width: 200px;
         display: none;
     }
@@ -449,11 +473,4 @@ input:focus{
         -ms-transform: translate(-50%,-50%);
         text-align: center;
     }
-
-    .leaflet-control-container .leaflet-top.leaflet-left { 
-        position: absolute; 
-        left: auto; 
-        right: 10px; 
-        top: 145px;
-    }  
 }

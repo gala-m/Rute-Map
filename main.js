@@ -1,6 +1,10 @@
+var mapDiv = document.getElementById("map");
+var overlayDiv = document.getElementById("bar");
+mapDiv.appendChild(overlayDiv);
+
 Icons =  '<a href="fontawesome.com">FA</a>';
 
-let transport = L.tileLayer('https://api.mapbox.com/styles/v1/winniatthepark/ckk518ast0a7o17paz5r7bros/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2lubmlhdHRoZXBhcmsiLCJhIjoiY2tocWxwYjB3MGFkeTJxcGJ6cDZzd285NCJ9.gZ7tGDVxt_ArW9WptTgK8A', {
+let transport = L.tileLayer('https://api.mapbox.com/styles/v1/winniatthepark/ckq3icq7j4fw817n6fbu5uq73/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2lubmlhdHRoZXBhcmsiLCJhIjoiY2tocWxwYjB3MGFkeTJxcGJ6cDZzd285NCJ9.gZ7tGDVxt_ArW9WptTgK8A', {
 	attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors </a> '+ ', ' + Icons, 
 });
 
@@ -12,6 +16,7 @@ let map = L.map('map', {
 	zoom: 15,
 	maxZoom: 28,
 	layers: [transport],
+	zoomControl: false
 });
 
 // Map panes for toggling route layers
@@ -19,6 +24,10 @@ let map = L.map('map', {
 var carto_pane = map.createPane('cpane');
 map.getPane('cpane').style.zIndex = 550;
 map.getPane('cpane').style.pointerEvents = 'none'; 
+
+var link_pane = map.createPane('lpane');
+map.getPane('lpane').style.zIndex = 550;
+map.getPane('lpane').style.pointerEvents = 'none'; 
 
 var result_pane = map.createPane('rpane');
 map.getPane('rpane').style.zIndex = 650;
@@ -32,14 +41,19 @@ let baseMaps = {
 };
 
 let cartoData = L.layerGroup().addTo(map);
+let zoomData = L.layerGroup().addTo(map);
 
 let overlayMaps = {
-	"Stops": cartoData,
+	"Stops": cartoData
 }
 
 L.control.layers(baseMaps, overlayMaps, {
 	collapsed: false
 }).addTo(map);
+
+if (L.Browser.mobile) {
+   $('#bar').remove();
+}
 
 // Location
 
@@ -72,6 +86,7 @@ var find = L.easyButton({
 	}]
 }).addTo(map);
 
+new L.Control.Zoom({ position: 'bottomright' }).addTo(map);
 
 // Draw
 
@@ -82,6 +97,7 @@ L.drawLocal.draw.toolbar.buttons.marker = 'place a stop';
 L.drawLocal.draw.handlers.marker.tooltip.start = 'to see stops on the ground clearly <br> 1. switch to the satellite map <br> in the top-right corner, <br> 2. zoom in ';
 
 drawControl = new L.Control.Draw({
+	position: 'topright',
 	draw: {
 		polygon: false,
 		polyline: false,
@@ -109,8 +125,6 @@ map.addControl(drawControl)
 
 map.addEventListener("draw:created", function (e, latlng) {
 	e.layer.addTo(drawnItems);
-	drawControl.remove(map);
-	drawControlEditOnly.addTo(map);
     createFormPopup();
 });
 
@@ -127,8 +141,6 @@ map.addEventListener("draw:deletestop", function (e) {
 	if (drawnItems.getLayers().length > 0) {
 		drawnItems.openPopup();
 	};
-	drawControlEditOnly.remove(map);
-	drawControl.addTo(map);
 });
 
 // Flag button to report route
@@ -136,11 +148,25 @@ map.addEventListener("draw:deletestop", function (e) {
 var flag = L.easyButton({
 	id: "flagbtn",
 	leafletClasses: true,  
+	position: 'topright',
 	states: [{
 		title: 'flag a route as incorrect',
 		icon: 'icons/flag-solid.svg', 
 		onClick: function(){
 			toggle_flag()
+		}
+	}]
+}).addTo(map);
+
+var mail = L.easyButton({
+	id: "mailbtn",
+	leafletClasses: true,  
+	position: 'topright',
+	states: [{
+		title: 'get in touch',
+		icon: 'icons/envelope-solid.svg', 
+		onClick: function(){
+			toggle_netlify()
 		}
 	}]
 }).addTo(map);
@@ -155,15 +181,10 @@ function toggle_flag() {
 // Busstop Icons
 
 var stopicon = L.icon({
-	iconUrl: "./icons/bus.png",
-	iconSize: [15, 30], 
-	iconAnchor: [10, 25],
-});
-
-var resulticon = L.icon({
-	iconUrl: "./icons/bluebus.png",
-	iconSize: [15, 30], 
-	iconAnchor: [10, 25],
+	iconUrl: "icons/bus.png",
+	iconSize: [15, 15], 
+	className: 'stopicon'
+	// iconAnchor: [10, 25],
 });
 
 // Add data from CARTO using the SQL API
@@ -181,13 +202,32 @@ function fetchroutes() {
 		})
 		.then(function (data) {		
 			L.geoJson(data, {
-				
-				pointToLayer: function (feature, latlng) {				
-					return new L.marker(latlng, { 
+				pointToLayer: function (feature, latlng) {	
+					console.log('lpane')			
+					return L.circleMarker(latlng, { 
+						radius: 1.5,
+						weight: 1, 
+						color: '#081f40',
+						pane: 'lpane',
+						
+					})
+				},	
+				onEachFeature: addPopup,
+
+			}).addTo(cartoData);
+			
+			link_pane.style.display = 'none';
+
+			L.geoJson(data, {
+
+				pointToLayer: function (feature, latlng) {	
+					console.log('cpane')				
+					return L.marker(latlng, { 
 						icon: stopicon,
 						pane: 'cpane'
-					}); 
+					})
 				},
+				
 				onEachFeature: addPopup 
 				
 			}).addTo(cartoData);
@@ -196,6 +236,32 @@ function fetchroutes() {
 }
 
 fetchroutes()
+
+function clickZoom(e) {
+    map.setView(e.target.getLatLng());
+}
+
+map.on('zoomend', function(e) {
+	
+	var currentZoom = map.getZoom();
+	
+    if (currentZoom > 15 ) {	
+		link_pane.style.display = 'none'
+        carto_pane.style.display = 'block' 
+
+		resultjson.eachLayer(function (layer) {  
+			layer.setStyle({radius: 8 }) 
+		});
+	
+	} else if (currentZoom < 15 ) {
+		carto_pane.style.display = 'none'
+		link_pane.style.display = 'block'	
+
+		resultjson.eachLayer(function (layer) {  
+			layer.setStyle({radius: 2.5 }) 
+		});	 
+    }
+})
 
 const popupContent =
 	'<form>' +
@@ -236,7 +302,6 @@ function addPopup(feature, layer) {
 			this.route2 = route2
 			this.route3 = route3
 		}
-	
 
 		complete() {
 			return `${this.cartodb_id} - ` + `${this.stopname}` + `<br> ${this.route1} ` + `<br> ${this.route2}` + `<br>${this.route3}`
@@ -248,22 +313,22 @@ function addPopup(feature, layer) {
 	if (feature.properties.cartodb_id, feature.properties.stopname, feature.properties.route1, feature.properties.route2, feature.properties.route3) {
 		layer.bindPopup(`
 		${all.complete()}<br>`
-		); 
+		).on('click', clickZoom); 
 	} else if (feature.properties.cartodb_id, feature.properties.stopname, feature.properties.route1, feature.properties.route2) {
 		layer.bindPopup(`
 		${all.complete()}<br>`
 		+ popupContent
-		); 
+		).on('click', clickZoom); 
 	} else if (feature.properties.cartodb_id, feature.properties.stopname, feature.properties.route1) {
 		layer.bindPopup(`
 		${all.complete()}<br>`
 		+ popupContent
-		); 
+		).on('click', clickZoom); 
 	} else if (feature.properties.cartodb_id) {
 		layer.bindPopup(`
 		${all.complete()}<br>`
 		+ popupName
-		); 		
+		).on('click', clickZoom); 		
 	} 
 };
 
@@ -424,20 +489,40 @@ var resultjson = L.layerGroup().addTo(map);
 function searchRoutes(data) {
 
 	carto_pane.style.display = 'none'
+	link_pane.style.display = 'none'
 
 	L.geoJSON(data, {
 		pointToLayer: function (feature, latlng) {
-			return L.marker(latlng, { icon: resulticon, pane: 'rpane'}, 
+			return L.circleMarker(latlng, { 
+				radius: 3,
+				weight: 1, 
+				fillOpacity: 1,
+				// fillColor: 'white',
+				color: '#081f40',
+				pane: 'rpane',
+				className: 'shadow'
+			}, 
 			map.flyTo(latlng, 14, {
 				animate: true,
 				duration: 1                                               
-			}));
+			}))		
     },
 		onEachFeature: addPopup
 		
 	}).addTo(resultjson);
+	
+	map.removeLayer(cartoData)
+	
+	setTimeout(function() { 
 
-	setTimeout(function() { carto_pane.style.display = 'block'; }, 30000);
+		cartoData.eachLayer(function (layer) {  
+			layer.setStyle({color: '#b9722d' }) 
+		});
+
+		map.addLayer(cartoData)
+
+	}, 20000); 
+
 }
 
 function returned_data(data) {
@@ -546,6 +631,11 @@ function toggle_netlify() {
 
 function toggle_mass() {
 	var e = document.getElementById('mass-send');
+	toggle(e)
+}
+
+function toggle_error() {
+	var e = document.getElementById('feedback-main');
 	toggle(e)
 }
 

@@ -20,6 +20,7 @@
     <div class="wrapper">
         <div class="box a">
             <div id='map' class='map' style="z-index: 1" position: relative></div>
+            <div id="bar"> </div>
         </div>
     </div>
     <nav id="nav-bar" style="z-index: 3;">
@@ -30,6 +31,7 @@
                 height="35px"
                 />
         </div>
+    </nav>     
         <form id="search_container" class="search-container" method="post" onsubmit="return search_function()" style="z-index: 2">
             <div id="search-type" class="inner-container" style="z-index: 5; display: none">
                 <input type="text" id="text_" placeholder="type to search">   
@@ -45,9 +47,13 @@
                 <input type="number" id="search-number" class="search" placeholder="#" size='width:30%'>
                 <button id="btn_submit" type="submit" ></button>
         </form>         
-    </nav>
+
     <div id="form-div" class="c-overlay" style="z-index: 5; display: none">
+        
         <form id="form-contact" method="POST" data-netlify="true" class="netlify-form">
+            <span class='close-mass' style="top: 0px; cursor: pointer;" onclick="return toggle_netlify()"; return false;>x</span>         
+            <h4>Get in touch</h4>
+            <br> <br>
             <input type="text" name="name" placeholder="Name" class="feedback-input"/> 
             <input type="text" name="email" placeholder="Email" class="feedback-input"/> 
             <textarea type="text" name="message" placeholder="Message" class="feedback-input"></textarea>
@@ -56,17 +62,20 @@
     </div>
     <div id="feedback-main" class="overlay" style="z-index: 3;  display: none">
         <div id="feedback-div" class="inner-div">
+            <span class='close-mass' style="top: 0px; cursor: pointer;" onclick="return toggle_error()"; return false;>x</span>
             <form class="feedback-form" id="feedback-divi" data-netlify="true">
+                <h4>Flag an error</h4>
+                <br> <br>
                 <input type="text" placeholder="Route" id="input_area" type="name" class="feedback-input" >
                 <input type="text" id="input_routenumber" class="feedback-input" placeholder="#" style="width: 45%;"><input type="text" id="input_cartodb_id" class="feedback-input" placeholder="ID e.g. 31" required="required" style="width: 45%; float: right;">
-                <input type="text" placeholder="Error" id="input_error" type="name" class="feedback-input" >
-                <input type="submit" value="Send Error" onclick="return send()" class="feed-button">
+                <input type="text" placeholder="describe the error" id="input_error" type="name" class="feedback-input" >
+                <input type="submit" value="Send Error" class="feed-button">
             </form>
         </div>
     </div>
     <div id="mass-send" class="overlay" style="z-index: 3;  display: none"> 
         <div id="feedback-div" class="inner-div"> Add
-            <span id='close-mass' style="top: 0px; cursor: pointer;" onclick="return toggle_mass()"; return false;>x</span>
+            <span class='close-mass' style="top: 0px; cursor: pointer;" onclick="return toggle_mass()"; return false;>x</span>
             <div class="feedback-form" id="feedback-divi" style="margin-top: 15px;">
                 <input type="text" placeholder="Route" id="mass_area" type="name" class="feedback-input" >
                 <input type="text" id="mass_routenumber" class="feedback-input" placeholder="#" style="width: 100%; margin-bottom: 15px;"> 
@@ -87,10 +96,6 @@
     </div>
     <div id="results-main" class="overlay" style="z-index: 3; display: none">
         <div id="no-results" class="inner-div">No Results</div>
-    </div>
-    <div id="contact-box" class="popup">
-        <button id="mail" class="btn_mail" onclick="location.href='mailto:rutemap@outlook.com';" ></button>     
-        <button id="netlify-button" class="net-button" onclick="return toggle_netlify()">contact</button>
     </div>
 
     <script src="./main.js"></script>
