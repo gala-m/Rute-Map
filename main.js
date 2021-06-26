@@ -12,6 +12,7 @@ let satellite = L.tileLayer('https://api.mapbox.com/styles/v1/winniatthepark/cko
 	attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors </a> '+ ', ' + Icons, 
 });
 let map = L.map('map', {
+	tap: false,
 	center: [-24.625180, 25.927364],
 	zoom: 15,
 	maxZoom: 28,
@@ -221,11 +222,23 @@ function fetchroutes() {
 			L.geoJson(data, {
 
 				pointToLayer: function (feature, latlng) {	
-					console.log('cpane')				
-					return L.marker(latlng, { 
-						icon: stopicon,
-						pane: 'cpane'
-					})
+					console.log('cpane')	
+					if (L.Browser.mobile) {
+						const mobileicon = L.icon({
+							iconUrl: "icons/bus.png",
+							iconSize: [20, 20], 
+						});
+						return L.marker(latlng, { 
+							icon: mobileicon,
+							pane: 'cpane'
+						})		
+
+					} else {
+						return L.marker(latlng, { 
+							icon: stopicon,
+							pane: 'cpane'
+						})						 
+					}
 				},
 				
 				onEachFeature: addPopup 
