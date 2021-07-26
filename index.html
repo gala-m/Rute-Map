@@ -7,9 +7,9 @@
     <title>Rute Map</title>
     <link rel="preload" href="main.js" as="script">
     <link rel="shortcut icon" href="./icons/icon.svg" type="image/x-icon">
-    <link rel="stylesheet" href="./styles.css"> 
     <link rel="stylesheet" href="leaflet.css">
     <link rel="stylesheet" href="leaflet.draw.css">
+    <link rel="stylesheet" href="./styles.css"> 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous"></script>
 </head>
@@ -33,16 +33,18 @@
         </div>
     </nav>     
         <form id="search_container" class="search-container" method="post" onsubmit="return search_function()" style="z-index: 2">
-            <div id="search-type" class="inner-container" style="z-index: 5; display: none">
+            <div id="search-type" class="inner-container" style="display: none">
                 <input type="text" id="text_" placeholder="type to search">   
                 <span id='close' onclick="return search_bar()"; return false;>x</span>
             </div>
-            <select id="search-select" class="inner-container"  style="z-index: 5; display: block">
-                <option value="">   Show Route Index</option>
+            <select id="search-select" class="inner-container"  style="display: block; padding-left: 5px;">
+                <option>Show Route Index</option>
                 <option>Broadhurst</option>
-                <option value="Kgale View">Kgale View</option>
-                <option value="Tlokweng">Tlokweng</option>
-                <option value="searchdata">Search the database instead</option>
+                <option>Gabane</option>
+                <option>Kgale View</option>
+                <option>Mogoditshane</option>
+                <option>Tlokweng</option>
+                <option value="searchdata" style="font-weight: bold">Search database instead</option>
             </select>
                 <input type="number" id="search-number" class="search" placeholder="#" size='width:30%'>
                 <button id="btn_submit" type="submit" ></button>

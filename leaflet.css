@@ -161,13 +161,17 @@
 	margin-left: 10px;
 	}
 .leaflet-right .leaflet-control {
-	margin-right: 20px;
+	margin-right: 25px;
 	}
 
 @media only screen and (max-width: 629px) {
 	.leaflet-bottom .leaflet-control {
 		margin-bottom: 80px;
-		}
+	}
+	.leaflet-right .leaflet-control {
+		margin-right: 15px;
+	}
+
 }
 
 /* zoom and fade animations */

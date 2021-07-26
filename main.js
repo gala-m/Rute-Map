@@ -4,17 +4,19 @@ mapDiv.appendChild(overlayDiv);
 
 Icons =  '<a href="fontawesome.com">FA</a>';
 
-let transport = L.tileLayer('https://api.mapbox.com/styles/v1/winniatthepark/ckq3icq7j4fw817n6fbu5uq73/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2lubmlhdHRoZXBhcmsiLCJhIjoiY2tocWxwYjB3MGFkeTJxcGJ6cDZzd285NCJ9.gZ7tGDVxt_ArW9WptTgK8A', {
-	attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors </a> '+ ', ' + Icons, 
+let transport = L.tileLayer('https://api.mapbox.com/styles/v1/winniatthepark/ckq3icq7j4fw817n6fbu5uq73/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2lubmlhdHRoZXBhcmsiLCJhIjoiY2tocWxwYjB3MGFkeTJxcGJ6cDZzd285NCJ9.gZ7tGDVxt_ArW9WptTgK8A', 
+	{	name: "transport",
+		attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors </a> '+ ', ' + Icons, 
 });
 
-let satellite = L.tileLayer('https://api.mapbox.com/styles/v1/winniatthepark/cko6xh5093lry17qb4k5ks8px/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2lubmlhdHRoZXBhcmsiLCJhIjoiY2tocWxwYjB3MGFkeTJxcGJ6cDZzd285NCJ9.gZ7tGDVxt_ArW9WptTgK8A', {
-	attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors </a> '+ ', ' + Icons, 
+let satellite = L.tileLayer('https://api.mapbox.com/styles/v1/winniatthepark/cko6xh5093lry17qb4k5ks8px/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1Ijoid2lubmlhdHRoZXBhcmsiLCJhIjoiY2tocWxwYjB3MGFkeTJxcGJ6cDZzd285NCJ9.gZ7tGDVxt_ArW9WptTgK8A', 
+	{	name: "satellite", 
+		attribution: '&copy; <a href="https://openstreetmap.org/copyright">OpenStreetMap contributors </a> '+ ', ' + Icons, 
 });
 let map = L.map('map', {
 	tap: false,
-	center: [-24.625180, 25.927364],
-	zoom: 15,
+	center: [-24.645180, 25.925364],
+	zoom: 13,
 	maxZoom: 28,
 	layers: [transport],
 	zoomControl: false
@@ -36,10 +38,10 @@ map.getPane('rpane').style.pointerEvents = 'none';
 
 // Map layers
 
-let baseMaps = {
-	"Roads": transport,
-	"Satellite": satellite
-};
+let baseMaps = {}
+
+baseMaps[transport.options.name] = transport;
+baseMaps[satellite.options.name] = satellite;
 
 let cartoData = L.layerGroup().addTo(map);
 let zoomData = L.layerGroup().addTo(map);
@@ -51,6 +53,35 @@ let overlayMaps = {
 L.control.layers(baseMaps, overlayMaps, {
 	collapsed: false
 }).addTo(map);
+
+map.activeBaseLayer = satellite;
+
+map.on("baselayerchange",
+	function(e) {
+		map.activeBaseLayer = e.layer
+		if (map.activeBaseLayer === satellite) {
+			cartoData.eachLayer(function (layer) {  
+				layer.setStyle({
+					weight: 1, 
+					color: '#15F4EE', 
+					fillColor: '#081f40', 
+					fillOpacity: 0.7,
+					radius: 2.5
+				}) 
+			});
+		} else if (map.activeBaseLayer === transport) {
+			cartoData.eachLayer(function (layer) {  
+				layer.setStyle({
+					radius: 1.5,
+					color: '#081f40',
+					fillColor: '#081f40', 
+					fillOpacity: 0.2,
+				}) 	
+			})	
+		}
+	}
+);
+
 
 if (L.Browser.mobile) {
    $('#bar').remove();
@@ -122,8 +153,6 @@ var drawControlEditOnly = new L.Control.Draw({
 
 map.addControl(drawControl)
 
-
-
 map.addEventListener("draw:created", function (e, latlng) {
 	e.layer.addTo(drawnItems);
     createFormPopup();
@@ -185,7 +214,6 @@ var stopicon = L.icon({
 	iconUrl: "icons/bus.png",
 	iconSize: [15, 15], 
 	className: 'stopicon'
-	// iconAnchor: [10, 25],
 });
 
 // Add data from CARTO using the SQL API
@@ -204,24 +232,6 @@ function fetchroutes() {
 		.then(function (data) {		
 			L.geoJson(data, {
 				pointToLayer: function (feature, latlng) {	
-					console.log('lpane')			
-					return L.circleMarker(latlng, { 
-						radius: 1.5,
-						weight: 1, 
-						color: '#081f40',
-						pane: 'lpane',
-						
-					})
-				},	
-				onEachFeature: addPopup,
-
-			}).addTo(cartoData);
-			
-			link_pane.style.display = 'none';
-
-			L.geoJson(data, {
-
-				pointToLayer: function (feature, latlng) {	
 					console.log('cpane')	
 					if (L.Browser.mobile) {
 						const mobileicon = L.icon({
@@ -237,12 +247,27 @@ function fetchroutes() {
 						return L.marker(latlng, { 
 							icon: stopicon,
 							pane: 'cpane'
-						})						 
+						})					 
 					}
 				},
-				
 				onEachFeature: addPopup 
-				
+
+			}).addTo(cartoData);
+			
+			carto_pane.style.display = 'none';
+
+			L.geoJson(data, {
+				pointToLayer: function (feature, latlng) {	
+					console.log('lpane')			
+					return L.circleMarker(latlng, { 
+						radius: 1.5,
+						weight: 1, 
+						color: '#081f40',
+						pane: 'lpane',
+					})
+				},	
+				onEachFeature: addPopup,
+
 			}).addTo(cartoData);
 			
 		})	
@@ -251,7 +276,9 @@ function fetchroutes() {
 fetchroutes()
 
 function clickZoom(e) {
-    map.setView(e.target.getLatLng());
+	if (L.Browser.mobile) {
+		map.setView(e.target.getLatLng());
+	}  
 }
 
 map.on('zoomend', function(e) {

@@ -37,11 +37,11 @@ body {
 }
 
 input[id=text_] {
-    padding-left: 5px;
+    padding-left: 10px;
     border: 0px;
     font-size: 17px;
-    height: 44px;
-
+    height: 43px;
+    border-top-left-radius: 5px;
 }
 
 input[id=text_]:focus, input[id=number_]:focus {
@@ -66,15 +66,15 @@ input[id=text_]:focus, input[id=number_]:focus {
 
 .inner-container {
     background-color: #fdfdfc;
-    color: gray;
+    color: #020268;;
     border-radius: 5px;
-    height: 42px;
+    height: 43px;
     position: fixed;
     width: 200px;
     width: 150px;
     border: none;
     cursor: pointer;
-    padding-left: 5px;
+    z-index: 5; 
 }
 
 .search-container:hover {
@@ -279,7 +279,7 @@ input:focus{
 }
 
 #nav-bar {
-    border-bottom: 1px solid #0202683d;
+    border-bottom: 1px solid #0202681c;
     background-color: #fdfdfc;
     border-top-right-radius: 5px;
     border-top-left-radius: 5px;
@@ -287,9 +287,32 @@ input:focus{
     height: 45px;
     width: auto;
     position: fixed;
-    left: 20px;
-    top: 10px;
+    left: 15px;
+    top: 15px;
     padding: 5px
+}
+
+.leaflet-draw-tooltip {
+	background: rgb(54, 54, 54);
+	background: rgba(0, 0, 0, 0.5);
+	border: 1px solid transparent;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	color: #fff;
+	font: 12px/18px "Helvetica Neue", Arial, Helvetica, sans-serif;
+	margin-left: -200px;
+	margin-top: 0;
+	padding: 4px 8px;
+	position: absolute;
+	visibility: hidden;
+	white-space: nowrap;
+    top : 90px;
+    transform : translateX(7%);
+	z-index: 6;
+}
+
+.leaflet-draw-tooltip:before {
+	display: none;
 }
 
 @media only screen and (min-width: 630px) {
@@ -317,21 +340,20 @@ input:focus{
     #bar {
         position: absolute;
         width: 30px;
-        right: 10px;
+        right: 15px;
+        top: 15px;
         background-color: #fdfdfc;
         padding: 10px;
-        z-index: 700;
-        top: 10px;
+        border-top-left-radius: 5px;
         border-top-right-radius: 5px;
         margin-bottom: 15px;
         box-shadow: 0 1px 5px rgba(0,0,0,0.09);
-        border-top-left-radius: 5px;
-        height: 95%;
+        z-index: 700;
+        height: 94%;
     }
 
     .rlogo {
         padding: 4px;
-        padding-left: 8px;
     }
 
     .search-container {
@@ -339,9 +361,10 @@ input:focus{
         height: 43px;
         width: 300px;
         position: fixed;
-        right: 10px;
-        top: 10px;
+        right: 15px;
+        top: 15px;
         box-shadow: 0 1px 5px rgba(0,0,0,0.09);
+        border-bottom: 1px solid #0202681c;
         border-top-right-radius: 5px;
         border-top-left-radius: 5px;
     }
@@ -389,7 +412,7 @@ input:focus{
     /* For Phones*/
 
     .leaflet-top .leaflet-control {
-        margin-top: 10px;
+        margin-top: 15px;
     }
 
     .rlogo {
@@ -406,8 +429,8 @@ input:focus{
         box-shadow: 0 1px 5px rgba(0,0,0,0.09);
         height: 44px;
         position: fixed;
-        left: 20px;
-        right: 20px;
+        left: 15px;
+        right: 15px;
         bottom: 20px;
     }
 
