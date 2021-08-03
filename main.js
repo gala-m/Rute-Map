@@ -418,10 +418,10 @@ function setData(e) {
 				case "submitrest" :
 					
 					const enteredID = document.getElementById("input_cartodb_id").value;
-
 					cartoData.eachLayer(function (layer) {
 						
 						query = "SELECT * FROM route_func('" + route + "', " + enteredID + ", '" + submission_date + "')";
+						
 						send_query()
 
 					})
@@ -457,7 +457,6 @@ function mass_query() {
 
 			if ( inputs[i].value!== '') {
 				query = "SELECT * FROM route_func('" + route + "', " +  inputs[i].value +  ", '" + submission_date + "')";
-				console.log(query)			
 			}
 			to_carto()
 
@@ -500,12 +499,13 @@ $(".feedback-input").keyup(function () {
     }
 })
 
-function send_query() {
+function send_query(e) {
 	if (document.getElementById("input_area").value == '' || document.getElementById("input_routenumber").value == '' ) {
 		alert("Please fill in all the fields.")
-		return true;
+		return false;
 	} else {
 		to_carto()
+		e.preventDefault();
 	} 
 }
 
