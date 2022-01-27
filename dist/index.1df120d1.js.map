@@ -1,0 +1,1 @@
+{"mappings":"AAAA,GAAG,CAAC,MAAM,GAAG,CAAC;IACV,YAAY,EAAG,CAAoG;AACrH,CAAC","sources":["config.js"],"sourcesContent":["var config = {\r\n    MAPBOX_TOKEN : 'pk.eyJ1Ijoid2lubmlhdHRoZXBhcmsiLCJhIjoiY2tocWxwYjB3MGFkeTJxcGJ6cDZzd285NCJ9.gZ7tGDVxt_ArW9WptTgK8A',\r\n  }\r\n  "],"names":[],"version":3,"file":"index.1df120d1.js.map","sourceRoot":"/__parcel_source_root/"}

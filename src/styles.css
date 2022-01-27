@@ -1,0 +1,310 @@
+body {
+    margin: 0;
+    padding: 0;
+    scrollbar-width: thin;
+    scrollbar-color: #040b21  rgba(253, 252, 250, 0);
+    font-family: Jost, sans-serif;
+}
+
+textarea, input {
+   font-family: inherit;
+   font-size: inherit;
+}
+
+.css-9emuhu-MuiPaper-root-MuiDrawer-paper {
+    height: 40%
+}
+
+#map {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+#app {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0; 
+    width: 300px;   
+    overflow-y: clip;
+}
+
+#container-background {
+    top: 0;
+    position: absolute;
+    mask: url(#mask-1);
+    height: 100vh;
+    background-color: #f7f7f7;
+    width: 320px; 
+    border-right-style: solid;
+    border-right-color: #040b21;
+}
+
+#container {
+    height: 95vh;
+    bottom: 30px;
+    right: 0;
+    left: 0; 
+    position: absolute;
+    width: 320px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+#welcome {
+    padding: 30px;
+    border: 3px solid #0b1e57;
+    margin: 15px;
+}
+
+#close {
+    float: right;
+    display: block;
+    padding: 2px 7px;
+    background: #cccccc38;
+    position: relative;
+    color: #020268;
+    margin-top: -20px;
+    margin-right: -20px;
+}
+
+#form-contact, #tip {
+    margin: 15px;
+}
+
+#message {
+    height:auto
+}
+
+.input {
+    background: none;
+    border: none;
+    border-bottom: 1px solid black;
+    margin: 15px;
+    height: 30px;
+    width: 70%;
+}
+
+.bar {
+    font-size: 18px;
+    margin: 6px;
+    padding: 12px;
+    color: #040b21;
+    cursor: pointer;
+    border-radius: 2px;
+}
+
+.bar:hover, .drawButton:hover {
+    border-left-color: #040b21;
+    border-left-style: solid
+}
+
+.barHolder {
+    display: inline-block;
+}
+
+.routeInfo {
+    font-size: 16px;
+}
+
+.fas {
+    padding: 10px
+}
+
+.logo {
+    display: block;
+    height: 50px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+    padding: 15px;
+    position: sticky;
+}
+
+.viewRouteAction, .navButton {
+    background: none;
+    border: none;
+    border-radius: 2px;
+    font-family: Jost, sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.navButton {
+    font-size: 22px;
+    margin: 7px;
+    margin-top: 0px;
+}
+
+.button:hover, .navButton:hover {
+    border-bottom: 3px solid #040b21;
+}
+
+.actionButton:hover {
+    border-right: 3px solid #040b21;
+}
+
+.fa-flag {
+    color: red
+}
+
+.fa-pen {
+    color: green
+}
+
+.actionContainer {
+    border-top: 1px solid #040b2142;
+}
+
+.next {
+    border-top: 1px solid #040b2142;
+    padding-top: 20px;
+    margin: 15px;
+}
+
+.nav {
+    margin: auto;
+    width: 78%;
+    padding: 20px
+}
+
+.button, .actionButton {
+    background-color: #e9e7e7;
+    border: none;
+    border-radius: 2px;
+    font-family: Jost, sans-serif;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 6px;
+    padding: 12px;
+    color: #040b21;
+    cursor: pointer;
+    width: 96%;
+}
+
+.loading {
+    margin-left: auto;
+    margin-right: auto;
+    width: 50px;
+    margin-top: 50px;
+}
+
+.rankicon {
+    height: 20px;
+    margin: 5px;
+    margin-bottom: -4px;
+    margin-left: 0;
+}
+
+@media only screen and (max-width: 600px) {
+
+    #app {
+        position: absolute;
+        top: 85%;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        width: auto;
+        overflow-y: clip;
+        height: auto;
+    }
+
+    #container-background {
+        border-right-style: none;
+        width: 100vw;
+        height: 100%;
+    }
+
+    #barHolder {
+        height: 100%;
+        bottom: 0;
+        width: 100vw;
+        position: absolute;
+        border-right-style: none;
+    }
+
+    #container {
+        top: 50px;
+        width: 98vw;
+        height: 100%;
+        border-right-style: none;
+        margin: auto;
+        display: grid;
+        grid-template-rows: 1fr 1fr 1fr 1fr;
+        overflow: scroll;
+    }
+
+    #drawer-close {
+        position: relative;
+        top: -45px;
+        display: block;
+        width: 100vw;
+        margin-left: auto;
+        margin-right: auto;
+        background: none;
+        border: none;
+    }
+
+    #drawer-open {
+        position: absolute;
+        bottom: 30px;
+        display: block;
+        width: 100vw;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 15px;
+        background: none;
+        border: none;
+        padding: 15px;
+        padding-bottom: 40px;
+    }
+
+    .nav {
+        margin-left: auto;
+        margin-right: auto;
+        width: auto;
+        padding: 0
+    }
+
+    .bar {
+        font-size: 18px;
+        width: 79vw;
+    }
+
+    .routeInfo {
+        font-size: 16px;
+    }
+
+    .logo {
+        width: 100%;
+        height: auto;
+        padding: 0
+    }
+
+    .logo-container {
+        display: grid;
+        grid-template-columns: auto auto;
+        width: 30%;
+        margin-left: 35%;
+        margin-right: 35%;
+        bottom: 45px;
+        position: absolute;
+    }
+
+    .fa-bars {
+        margin: 8px;
+        margin-left: 0;
+        padding-left: 0;
+    }
+
+    .drawer-button {
+        width: 100%;
+        height: 90px;
+        bottom: 0;
+        position: absolute;
+    }
+}
